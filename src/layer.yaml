@@ -1,0 +1,8 @@
+includes:
+  - layer:openstack-api
+  - interface:mysql-shared
+  - interface:rabbitmq
+  - interface:keystone
+  - interface:neutron-plugin
+  - interface:manila-plugin
+repo: https://github.com/openstack/charm-manila

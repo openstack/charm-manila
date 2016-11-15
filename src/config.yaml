@@ -1,0 +1,63 @@
+options:
+  openstack-origin:
+    default: distro
+    type: string
+    description: |
+      Repository from which to install.  May be one of the following:
+      distro (default), ppa:somecustom/ppa, a deb url sources entry,
+      or a supported Cloud Archive release pocket.
+
+      Supported Cloud Archive sources include: cloud:precise-folsom,
+      cloud:precise-folsom/updates, cloud:precise-folsom/staging,
+      cloud:precise-folsom/proposed.
+
+      Note that updating this setting to a source that is known to
+      provide a later version of OpenStack will trigger a software
+      upgrade.
+  rabbit-user:
+    default: manila
+    type: string
+    description: Username used to access rabbitmq queue
+  rabbit-vhost:
+    default: openstack
+    type: string
+    description: Rabbitmq vhost
+  database-user:
+    default: manila
+    type: string
+    description: Username for Manila database access
+  database:
+    default: manila
+    type: string
+    description: Database name for Manila
+  debug:
+    default: False
+    type: boolean
+    description: Enable debug logging
+  verbose:
+    default: False
+    type: boolean
+    description: Enable verbose logging
+  region:
+    default: RegionOne
+    type: string
+    description: OpenStack Region
+  share-protocols:
+    type: string
+    default: NFS CIFS
+    description: |
+      The share protocols that the backends will be able to provide.  The
+      default is good for the generic backends.  Other backends may not support
+      both NFS and CIFS.  This is a space delimited list of protocols.
+  default-share-backend:
+    type: string
+    default: ""
+    description: |
+      The default backend for this manila set. Must be one of the
+      'share-backends' or the charm will block.
+  default-share-type:
+    type: string
+    default: default_share_type
+    description: |
+      The 'default_share_type' must match the the configured default_share_type
+      set up in manila using 'manila create-type'.
