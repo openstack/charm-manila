@@ -1,6 +1,6 @@
 # Overview
 
-Pre-release charm for testing:
+This is a pre-release charm for testing.
 
 This charm provides the Manila shared file service for an OpenStack Cloud.  It
 installs a single instance that, on its own, can't be used.
