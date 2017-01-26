@@ -17,6 +17,8 @@ from __future__ import print_function
 
 import mock
 
+import charmhelpers
+
 import charm.openstack.manila as manila
 
 import charms_openstack.test_utils as test_utils
@@ -84,7 +86,7 @@ class TestManilaCharmConfigProperties(Helper):
 class TestManilaCharm(Helper):
 
     def _patch_config_and_charm(self, config):
-        self.patch_object(manila.hookenv, 'config')
+        self.patch_object(charmhelpers.core.hookenv, 'config')
 
         def cf(key=None):
             if key is not None:
@@ -162,11 +164,9 @@ class TestManilaCharm(Helper):
             'database-user': 'user1'
         }
         c = self._patch_config_and_charm(config)
-        self.patch_object(manila.hookenv, 'unit_private_ip')
-        self.unit_private_ip.return_value = 'ip1'
         self.assertEqual(
             c.get_database_setup(),
-            [dict(database='db1', username='user1', hostname='ip1')])
+            [dict(database='db1', username='user1')])
 
     def test_register_endpoints(self):
         # note that this also tests _custom_register_endpoints() indirectly,

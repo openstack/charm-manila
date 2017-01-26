@@ -20,8 +20,6 @@ from __future__ import absolute_import
 import re
 import subprocess
 
-import charmhelpers.core.hookenv as hookenv
-
 import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.ip as os_ip
@@ -208,8 +206,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         return [
             dict(
                 database=self.options.database,
-                username=self.options.database_user,
-                hostname=hookenv.unit_private_ip(), )
+                username=self.options.database_user, )
         ]
 
     def register_endpoints(self, keystone):
