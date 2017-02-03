@@ -248,36 +248,13 @@ class TestManilaCharm(Helper):
         self.out.relation.get_configuration_data.return_value = {}
         self.assertEqual(c.config_lines_for('conf'), [])
         config = {
-            'conf': {
-                'complete': True,
-                '[section1]': (
-                    'line1', 'line2'),
-                '[section2]': (
-                    'line3', ),
-            },
-            'conf2': {
-                'complete': True,
-                '[section3]': (
-                    'line4', 'line5'),
-            },
-            'conf3': {
-                'complete': False,
-                '[section4]': (
-                    'line6', 'line7'),
+            'other-end': {
+                'conf': "conf-string",
+                'conf2': "conf2-string",
+                'conf3': "conf3-string",
             }
         }
         self.out.relation.get_configuration_data.return_value = config
-        self.assertEqual(c.config_lines_for('conf'), [
-            '[section1]',
-            'line1',
-            'line2',
-            '',
-            '[section2]',
-            'line3',
-            ''])
-        self.assertEqual(c.config_lines_for('conf2'), [
-            '[section3]',
-            'line4',
-            'line5',
-            ''])
-        self.assertEqual(c.config_lines_for('conf3'), [])
+        self.assertEqual(c.config_lines_for('conf'), ["conf-string", ''])
+        self.assertEqual(c.config_lines_for('conf2'), ["conf2-string", ''])
+        self.assertEqual(c.config_lines_for('conf3'), ["conf3-string", ''])

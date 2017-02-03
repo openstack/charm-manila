@@ -307,28 +307,56 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         """Return the list of configuration lines for `config_file` as returned
         by manila-plugin backend charms.
 
-        TODO: Note that it is not clear how we get this from multiple plugin
-        charms -- still to be worked out
+        The configuration from the adapter looks like:
+
+        {
+            "<name1>": {
+                "<config file path>": <string>,
+                "<config file path 2>": <string>
+            },
+            "<name2>": {
+                "<config file path>": <string>,
+            },
+        }
 
         :param config_file: string, filename for configuration lines
         :returns: list of strings: config lines for `config_file`
         """
         adapter = self.get_adapter('manila-plugin.available')
-        if adapter is not None:
-            # get the configuration data for all plugins
-            config_data = adapter.relation.get_configuration_data()
-            if config_file not in config_data:
-                return []
-            config_lines = []
-            for section, lines in config_data[config_file].items():
-                if section == 'complete':
-                    # if the 'lines' is not truthy, then this conf isn't
-                    # complete, so just break out.
-                    if not lines:
-                        break
-                    continue
-                config_lines.append(section)
-                config_lines.extend(lines)
-                config_lines.append('')
-            return config_lines
-        return []
+        if adapter is None:
+            return []
+        # get the configuration data for all plugins
+        config_data = adapter.relation.get_configuration_data()
+        # make the config_data <config_file>: {<name>: string} format
+        inverted_config_data = {}
+        for name, config_files in config_data.items():
+            for file, data in config_files.items():
+                if file not in inverted_config_data:
+                    inverted_config_data[file] = {}
+                inverted_config_data[file][name] = data
+        # now see if it's the one we want
+        if config_file not in inverted_config_data:
+            return []
+        config_lines = []
+        for name, chunk in inverted_config_data[config_file].items():
+            config_lines.append(chunk)
+            config_lines.append('')
+        return config_lines
+
+    def config_files(self):
+        """Return a set of all the config files that want to be written by the
+        subordinate charms.
+
+        :returns: [list of config files]
+        """
+        adapter = self.get_adapter('manila-plugin.available')
+        if adapter is None:
+            return []
+        # get the configuration data for all plugins
+        config_data = adapter.relation.get_configuration_data()
+
+        config_files = set()
+        for name, data in config_data.items():
+            for config_file, chunks in data.items():
+                config_files.add(config_file)
+        return list(config_files)

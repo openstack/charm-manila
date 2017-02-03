@@ -41,11 +41,23 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                                  'manila-plugin.connected', ),
                 'maybe_do_syncdb': ('shared-db.available',
                                     'manila.config.rendered', ),
-                'config_changed': ('config.changed',
-                                   'shared-db.available',
+                'config_changed': ('shared-db.available',
                                    'identity-service.available',
                                    'amqp.available', )
-            }
+            },
+            'when_not': {
+                'register_endpoints': ('identity-service.available',
+                                       'update-status', ),
+                'config_changed': ('update-status', ),
+                'render_stuff': ('update-status', ),
+                'share_to_manila_plugins_auth': ('update-status', ),
+                'maybe_do_syncdb': ('update-status', ),
+            },
+            'when_any': {
+                'config_changed': ('config-changed',
+                                   'manila-plugin.changed', ),
+
+            },
         }
         # test that the hooks were registered via the
         # reactive.barbican_handlers
@@ -78,11 +90,16 @@ class TestRenderStuff(test_utils.PatchHelper):
         manila_charm = self._patch_provide_charm_instance()
         self.patch('charms.reactive.set_state', name='set_state')
 
+        manila_plugin = mock.MagicMock()
+        self.patch('charms.reactive.RelationBase.from_state',
+                   name='from_state',
+                   return_value=manila_plugin)
         handlers.render_stuff('arg1', 'arg2')
         manila_charm.render_with_interfaces.assert_called_once_with(
             ('arg1', 'arg2', ))
         manila_charm.assess_status.assert_called_once_with()
         self.set_state.assert_called_once_with('manila.config.rendered')
+        manila_plugin.clear_changed.assert_called_once_with()
 
     def test_config_changed(self):
         self.patch_object(handlers, 'render_stuff')
