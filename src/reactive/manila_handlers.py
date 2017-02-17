@@ -31,11 +31,13 @@ charms_openstack.charm.use_defaults(
     # 'identity-service.connected',
     'identity-service.available',  # enables SSL support
     # 'config.changed',
-    # 'update-status'
+    'update-status'
 )
 
 
 @charms.reactive.when('identity-service.connected')
+@charms.reactive.when_not('identity-service.available',
+                          'update-status')
 def register_endpoints(keystone):
     """Register the endpoints when the identity-service connects.
     Note that this charm doesn't use the default endpoint registration function
@@ -49,12 +51,13 @@ def register_endpoints(keystone):
 
 @charms.reactive.when('identity-service.connected',
                       'manila-plugin.connected')
-def share_to_manila_plugins_auth(keystone, manila_plugin):
+@charms.reactive.when_not('update-status')
+def share_to_manila_plugins_auth(keystone, manila_plugin, *args):
     """When we have the identity-service and (a) backend plugin, share the auth
     plugin with the back end.
 
-    TODO: if we have multiple manila-plugin's does this get called for each
-    relation that gets connected?
+    Note that the interface deals with ensurign that each plugin gets the same
+    data.
     """
     data = {
         'username': keystone.service_username(),
@@ -78,6 +81,7 @@ def share_to_manila_plugins_auth(keystone, manila_plugin):
 
 @charms.reactive.when('shared-db.available',
                       'manila.config.rendered')
+@charms.reactive.when_not('update-status')
 def maybe_do_syncdb(shared_db):
     """Sync the database when the shared-db becomes available.  Note that the
     charms.openstack.OpenStackCharm.db_sync() default method checks that only
@@ -92,20 +96,31 @@ def maybe_do_syncdb(shared_db):
 @charms.reactive.when('shared-db.available',
                       'identity-service.available',
                       'amqp.available')
+@charms.reactive.when_not('update-status')
 def render_stuff(*args):
     """Render the configuration for Manila when all the interfaces are
     available.
+
+    Note that the charm class actually calls on the manila-plugin directly to
+    get the config, so we unconditionally clear the changed status here, if it
+    was set.
     """
     with charms_openstack.charm.provide_charm_instance() as manila_charm:
         manila_charm.render_with_interfaces(args)
         manila_charm.assess_status()
         charms.reactive.set_state('manila.config.rendered')
+        manila_plugin = charms.reactive.RelationBase.from_state(
+            'manila-plugin.changed')
+        if manila_plugin:
+            manila_plugin.clear_changed()
 
 
-@charms.reactive.when('config.changed',
-                      'shared-db.available',
+@charms.reactive.when('shared-db.available',
                       'identity-service.available',
                       'amqp.available')
+@charms.reactive.when_any('config-changed',
+                          'manila-plugin.changed')
+@charms.reactive.when_not('update-status')
 def config_changed(*args):
     """When the configuration is changed, check that we have all the interfaces
     and then re-render all the configuration files.  Note that this means that
