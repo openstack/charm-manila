@@ -17,6 +17,7 @@
 # needed on the class.
 from __future__ import absolute_import
 
+import collections
 import re
 import subprocess
 
@@ -145,6 +146,21 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
 
     # This is the command to sync the database
     sync_cmd = ['sudo', 'manila-manage', 'db', 'sync']
+
+    # Package for release version detection
+    release_pkg = 'manila-common'
+
+    # Package codename map for manila-common
+    package_codenames = {
+        'manila-common': collections.OrderedDict([
+            ('2', 'mitaka'),
+            ('3', 'newton'),
+            ('4', 'ocata'),
+            ('5', 'pike'),
+            ('6', 'queens'),
+            ('7', 'rocky'),
+        ]),
+    }
 
     # ha_resources = ['vips', 'haproxy']
 
