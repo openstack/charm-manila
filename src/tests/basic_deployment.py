@@ -1,13 +1,6 @@
 import amulet
-import json
-import subprocess
-import time
 
-from keystoneclient import session as keystone_session
-from keystoneclient.auth import identity as keystone_identity
 import keystoneclient.exceptions
-from keystoneclient.v2_0 import client as keystone_v2_0_client
-from keystoneclient.v3 import client as keystone_v3_client
 from manilaclient.v1 import client as manila_client
 
 from charmhelpers.contrib.openstack.amulet.deployment import (
@@ -110,68 +103,11 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
         u.log.debug('openstack release str: {}'.format(
             self._get_openstack_release_string()))
 
-        keystone_ip = self.keystone_sentry.relation(
-            'shared-db', 'percona-cluster:shared-db')['private-address']
-
-        # We need to auth either to v2.0 or v3 keystone
-        if self._keystone_version == '2':
-            ep = ("http://{}:35357/v2.0"
-                  .format(keystone_ip.strip().decode('utf-8')))
-            auth = keystone_identity.v2.Password(
-                username='admin',
-                password='openstack',
-                tenant_name='admin',
-                auth_url=ep)
-            keystone_client_lib = keystone_v2_0_client
-        elif self._keystone_version == '3':
-            ep = ("http://{}:35357/v3"
-                  .format(keystone_ip.strip().decode('utf-8')))
-            auth = keystone_identity.v3.Password(
-                user_domain_name='admin_domain',
-                username='admin',
-                password='openstack',
-                domain_name='admin_domain',
-                auth_url=ep)
-            keystone_client_lib = keystone_v3_client
-        else:
-            raise RuntimeError("keystone version must be '2' or '3'")
-
-        sess = keystone_session.Session(auth=auth)
-        self.keystone = keystone_client_lib.Client(session=sess)
-        # The service_catalog is missing from V3 keystone client when auth is
-        # done with session (via authenticate_keystone_admin()
-        # See https://bugs.launchpad.net/python-keystoneclient/+bug/1508374
-        # using session construct client will miss service_catalog property
-        # workaround bug # 1508374 by forcing a pre-auth and therefore, getting
-        # the service-catalog --
-        # see https://bugs.launchpad.net/python-keystoneclient/+bug/1547331
-        self.keystone.auth_ref = auth.get_access(sess)
-
-    def _run_action(self, unit_id, action, *args):
-        command = ["juju", "action", "do", "--format=json", unit_id, action]
-        command.extend(args)
-        print("Running command: %s\n" % " ".join(command))
-        output = subprocess.check_output(command)
-        output_json = output.decode(encoding="UTF-8")
-        data = json.loads(output_json)
-        action_id = data[u'Action queued with id']
-        return action_id
-
-    def _wait_on_action(self, action_id):
-        command = ["juju", "action", "fetch", "--format=json", action_id]
-        while True:
-            try:
-                output = subprocess.check_output(command)
-            except Exception as e:
-                print(e)
-                return False
-            output_json = output.decode(encoding="UTF-8")
-            data = json.loads(output_json)
-            if data[u"status"] == "completed":
-                return True
-            elif data[u"status"] == "failed":
-                return False
-            time.sleep(2)
+        # Authenticate admin with keystone endpoint
+        self.keystone = u.authenticate_keystone_admin(self.keystone_sentry,
+                                                      user='admin',
+                                                      password='openstack',
+                                                      tenant='admin')
 
     def test_100_services(self):
         """Verify the expected services are running on the corresponding
@@ -434,14 +370,6 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
                 key=lambda r: r.name.lower() == admin_role.name.lower(),
                 create=lambda: self.keystone.roles.add_user_role(
                     demo_user, admin_role, tenant=tenant))
-            # now we can finally get the manila client and create the secret
-            keystone_ep = self.keystone.service_catalog.url_for(
-                service_type='identity', endpoint_type='publicURL')
-            auth = keystone_identity.v2.Password(
-                username=demo_user.name,
-                password='pass',
-                tenant_name=tenant.name,
-                auth_url=keystone_ep)
 
         else:
             # find or create the 'default' domain
@@ -491,23 +419,15 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
                     role=admin_role,
                     user=demo_user,
                     project=demo_project)
-            # now we can finally get the manila client and create the secret
-            keystone_ep = self.keystone.service_catalog.url_for(
-                service_type='identity', endpoint_type='publicURL')
-            auth = keystone_identity.v3.Password(
-                user_domain_name=domain.name,
-                username=demo_user.name,
-                password='pass',
-                project_domain_name=domain.name,
-                project_name=demo_project.name,
-                auth_url=keystone_ep)
 
-        # Now we carry on with common v2 and v3 code
-        sess = keystone_session.Session(auth=auth)
+        self.keystone_demo = u.authenticate_keystone_user(
+            self.keystone, user='demo',
+            password='pass', tenant='demo')
+
         # Authenticate admin with manila endpoint
         manila_ep = self.keystone.service_catalog.url_for(
-            service_type='share', endpoint_type='publicURL')
-        manila = manila_client.Client(session=sess,
+            service_type='share', interface='publicURL')
+        manila = manila_client.Client(session=self.keystone_demo.session,
                                       endpoint=manila_ep)
         # now just try a list the shares
         manila.shares.list()
@@ -564,8 +484,8 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
 
         assert u.status_get(unit)[0] == "active"
 
-        action_id = self._run_action(unit_name, "pause")
-        assert self._wait_on_action(action_id), "Pause action failed."
+        action_id = u.run_action(unit_name, "pause")
+        assert u.wait_on_action(action_id), "Pause action failed."
         assert u.status_get(unit)[0] == "maintenance"
 
         # trigger config-changed to ensure that services are still stopped
@@ -575,7 +495,7 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
         self.d.configure(juju_service, {'debug': 'False'})
         assert u.status_get(unit)[0] == "maintenance"
 
-        action_id = self._run_action(unit_name, "resume")
-        assert self._wait_on_action(action_id), "Resume action failed."
+        action_id = u.run_action(unit_name, "resume")
+        assert u.wait_on_action(action_id), "Resume action failed."
         assert u.status_get(unit)[0] == "active"
         u.log.debug('OK')
