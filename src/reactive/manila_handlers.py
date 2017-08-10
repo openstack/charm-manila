@@ -15,6 +15,9 @@
 # this is just for the reactive handlers and calls into the charm.
 from __future__ import absolute_import
 
+import charmhelpers.contrib.openstack.utils as os_utils
+import charmhelpers.core.host as ch_host
+
 import charms.reactive
 import charms_openstack.charm
 
@@ -28,16 +31,12 @@ charms_openstack.charm.use_defaults(
     'charm.installed',
     'amqp.connected',
     'shared-db.connected',
-    # 'identity-service.connected',
     'identity-service.available',  # enables SSL support
-    # 'config.changed',
-    'update-status'
 )
 
 
 @charms.reactive.when('identity-service.connected')
-@charms.reactive.when_not('identity-service.available',
-                          'update-status')
+@charms.reactive.when_not('identity-service.available')
 def register_endpoints(keystone):
     """Register the endpoints when the identity-service connects.
     Note that this charm doesn't use the default endpoint registration function
@@ -51,7 +50,6 @@ def register_endpoints(keystone):
 
 @charms.reactive.when('identity-service.connected',
                       'manila-plugin.connected')
-@charms.reactive.when_not('update-status')
 def share_to_manila_plugins_auth(keystone, manila_plugin, *args):
     """When we have the identity-service and (a) backend plugin, share the auth
     plugin with the back end.
@@ -81,7 +79,6 @@ def share_to_manila_plugins_auth(keystone, manila_plugin, *args):
 
 @charms.reactive.when('shared-db.available',
                       'manila.config.rendered')
-@charms.reactive.when_not('update-status')
 def maybe_do_syncdb(shared_db):
     """Sync the database when the shared-db becomes available.  Note that the
     charms.openstack.OpenStackCharm.db_sync() default method checks that only
@@ -96,7 +93,6 @@ def maybe_do_syncdb(shared_db):
 @charms.reactive.when('shared-db.available',
                       'identity-service.available',
                       'amqp.available')
-@charms.reactive.when_not('update-status')
 def render_stuff(*args):
     """Render the configuration for Manila when all the interfaces are
     available.
@@ -120,7 +116,6 @@ def render_stuff(*args):
                       'amqp.available')
 @charms.reactive.when_any('config-changed',
                           'manila-plugin.changed')
-@charms.reactive.when_not('update-status')
 def config_changed(*args):
     """When the configuration is changed, check that we have all the interfaces
     and then re-render all the configuration files.  Note that this means that
@@ -128,3 +123,25 @@ def config_changed(*args):
     available and STAY available.
     """
     render_stuff(*args)
+
+
+@charms.reactive.hook('update-status')
+def update_status():
+    """Use the update-status hook to check to see if we can restart the
+    manila-share service: (BUG#1706699).  The bug appears to be a race-hazard
+    but it's proving very difficult to track it down.
+
+    This is a band-aid to enable the charm to get into a working state once all
+    of the interfaces have joined, and the bug has been hit; otherwise the
+    charm stays "stuck" with the service not running.
+
+    Note, there is no need to actually call update_status as one of the other
+    handlers will activate it.
+    """
+    if not os_utils.is_unit_paused_set():
+        state, message = os_utils._ows_check_services_running(
+            services=['manila-share'],
+            ports=None)
+        if state == 'blocked':
+            # try to start the 'manila-share' service
+            ch_host.service_start('manila-share')

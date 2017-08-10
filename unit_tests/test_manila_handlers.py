@@ -46,12 +46,7 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                    'amqp.available', )
             },
             'when_not': {
-                'register_endpoints': ('identity-service.available',
-                                       'update-status', ),
-                'config_changed': ('update-status', ),
-                'render_stuff': ('update-status', ),
-                'share_to_manila_plugins_auth': ('update-status', ),
-                'maybe_do_syncdb': ('update-status', ),
+                'register_endpoints': ('identity-service.available', ),
             },
             'when_any': {
                 'config_changed': ('config-changed',

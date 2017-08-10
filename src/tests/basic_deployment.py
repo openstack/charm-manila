@@ -430,7 +430,8 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
         manila = manila_client.Client(session=self.keystone_demo.session,
                                       endpoint=manila_ep)
         # now just try a list the shares
-        manila.shares.list()
+        # NOTE(AJK) the 'search_opts={}' is to work around Bug#1707303
+        manila.shares.list(search_opts={})
         u.log.debug('OK')
 
     def test_900_restart_on_config_change(self):
