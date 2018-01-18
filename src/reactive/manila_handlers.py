@@ -19,6 +19,7 @@ import charmhelpers.contrib.openstack.utils as os_utils
 import charmhelpers.core.host as ch_host
 
 import charms.reactive
+import charms.reactive.relations as relations
 import charms_openstack.charm
 
 # This charm's library contains all of the handler code associated with
@@ -105,8 +106,7 @@ def render_stuff(*args):
         manila_charm.render_with_interfaces(args)
         manila_charm.assess_status()
         charms.reactive.set_state('manila.config.rendered')
-        manila_plugin = charms.reactive.RelationBase.from_state(
-            'manila-plugin.changed')
+        manila_plugin = relations.endpoint_from_flag('manila-plugin.changed')
         if manila_plugin:
             manila_plugin.clear_changed()
 

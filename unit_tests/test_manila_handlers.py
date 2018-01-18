@@ -86,8 +86,8 @@ class TestRenderStuff(test_utils.PatchHelper):
         self.patch('charms.reactive.set_state', name='set_state')
 
         manila_plugin = mock.MagicMock()
-        self.patch('charms.reactive.RelationBase.from_state',
-                   name='from_state',
+        self.patch('charms.reactive.relations.endpoint_from_flag',
+                   name='endpoint_from_flag',
                    return_value=manila_plugin)
         handlers.render_stuff('arg1', 'arg2')
         manila_charm.render_with_interfaces.assert_called_once_with(
