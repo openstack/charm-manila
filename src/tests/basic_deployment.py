@@ -31,7 +31,10 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
         """
         super(ManilaBasicDeployment, self).__init__(
             series, openstack, source, stable)
-        self._keystone_version = '2'
+        if self._get_openstack_release() >= self.xenial_queens:
+            self._keystone_version = '3'
+        else:
+            self._keystone_version = '2'
         self._add_services()
         self._add_relations()
         self._configure_services()
@@ -103,11 +106,10 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
         u.log.debug('openstack release str: {}'.format(
             self._get_openstack_release_string()))
 
-        # Authenticate admin with keystone endpoint
-        self.keystone = u.authenticate_keystone_admin(self.keystone_sentry,
-                                                      user='admin',
-                                                      password='openstack',
-                                                      tenant='admin')
+        # Authenticate admin with keystone
+        self.keystone_session, self.keystone = u.get_default_keystone_session(
+            self.keystone_sentry,
+            openstack_release=self._get_openstack_release())
 
     def test_100_services(self):
         """Verify the expected services are running on the corresponding
@@ -174,6 +176,7 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
         u.log.debug('Checking manila api endpoint data...')
         endpoints = self.keystone.endpoints.list()
         u.log.debug(endpoints)
+        expected_num_eps = 3
         admin_port = '8786'
         internal_port = public_port = admin_port
         if self._keystone_version == '2':
@@ -187,6 +190,8 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
             ret = u.validate_endpoint_data(
                 endpoints, admin_port, internal_port, public_port, expected)
         elif self._keystone_version == '3':
+            if self._get_openstack_release() >= self.xenial_queens:
+                expected_num_eps = 6
             # For keystone v3 it's slightly different.
             expected = {'id': u.not_null,
                         'region': 'RegionOne',
@@ -196,7 +201,8 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
                         'service_id': u.not_null}
 
             ret = u.validate_v3_endpoint_data(
-                endpoints, admin_port, internal_port, public_port, expected)
+                endpoints, admin_port, internal_port, public_port, expected,
+                expected_num_eps=expected_num_eps)
         else:
             raise RuntimeError("Unexpected self._keystone_version: {}"
                                .format(self._keystone_version))
@@ -339,6 +345,7 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
         # a demo user, demo project, and then get a demo manila client and do
         # the secret.  ensure that the default domain is created.
 
+        keystone_ip = self.keystone_sentry.info['public-address']
         if self._keystone_version == '2':
             # find or create the 'demo' tenant (project)
             tenant = self._find_or_create(
@@ -371,6 +378,14 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
                 create=lambda: self.keystone.roles.add_user_role(
                     demo_user, admin_role, tenant=tenant))
 
+            # Authenticate demo user with keystone
+            self.demo_user_session, _ = u.get_keystone_session(
+                keystone_ip,
+                'demo',
+                'pass',
+                api_version=2,
+                project_name='demo',
+            )
         else:
             # find or create the 'default' domain
             domain = self._find_or_create(
@@ -419,15 +434,20 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
                     role=admin_role,
                     user=demo_user,
                     project=demo_project)
-
-        self.keystone_demo = u.authenticate_keystone_user(
-            self.keystone, user='demo',
-            password='pass', tenant='demo')
+            self.demo_user_session, _ = u.get_keystone_session(
+                keystone_ip,
+                'demo',
+                'pass',
+                api_version=3,
+                project_name='demo',
+                user_domain_name='default',
+                project_domain_name='default',
+            )
 
         # Authenticate admin with manila endpoint
         manila_ep = self.keystone.service_catalog.url_for(
             service_type='share', interface='publicURL')
-        manila = manila_client.Client(session=self.keystone_demo.session,
+        manila = manila_client.Client(session=self.demo_user_session,
                                       endpoint=manila_ep)
         # now just try a list the shares
         # NOTE(AJK) the 'search_opts={}' is to work around Bug#1707303
