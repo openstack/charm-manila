@@ -170,6 +170,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
 
     release = 'mitaka'
     name = 'manila'
+    group = 'manila'
     packages = PACKAGES
     api_ports = {
         'manila-api': {
