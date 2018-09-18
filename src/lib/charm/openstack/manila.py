@@ -430,3 +430,24 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
             for config_file, chunks in data.items():
                 config_files.add(config_file)
         return list(config_files)
+
+
+class ManilaCharmRocky(ManilaCharm):
+
+    release = 'rocky'
+
+    packages = [
+        'manila-api',
+        'manila-data',
+        'manila-scheduler',
+        'manila-share',
+        'python3-manila',
+    ]
+
+    purge_packages = [
+        'python-manila',
+        'python-memcache',
+        'python-pymysql',
+    ]
+
+    python_version = 3
