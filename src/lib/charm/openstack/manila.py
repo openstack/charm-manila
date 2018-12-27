@@ -237,7 +237,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
 
     def custom_assess_status_check(self):
         """Verify that the configuration provided is valid and thus the service
-        is ready to go.  This will return blocked if the configuraiton is not
+        is ready to go.  This will return blocked if the configuration is not
         valid for the service.
 
         :returns (status: string, message: string): the status, and message if
