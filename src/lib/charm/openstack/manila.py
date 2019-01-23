@@ -288,14 +288,14 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
 
         :param keystone: the keystone relation on which to setup the endpoints
         """
-        # regsiter the first endpoint
+        # register the first endpoint
         self._custom_register_endpoints(keystone, 'v1',
                                         self.service_type,
                                         self.region,
                                         self.public_url,
                                         self.internal_url,
                                         self.admin_url)
-        # regsiter the second endpoint
+        # register the second endpoint
         self._custom_register_endpoints(keystone, 'v2',
                                         self.service_type_v2,
                                         self.region,
