@@ -1,8 +1,9 @@
 # Overview
 
-This is a pre-release charm for testing.
+This charm exists to provide an example for Manila integration, for the purpose
+of test and reference.  It is not intended for production use in any case.
 
-This charm provides the Manila shared file service for an OpenStack Cloud.  It
+It provides the Manila shared file service for an OpenStack Cloud.  It
 installs a single instance that, on its own, can't be used.
 
 In order to use the manila charm, a suitable backend charm is needed to
