@@ -9,4 +9,3 @@ repo: https://github.com/openstack/charm-manila
 options:
   basic:
     use_venv: true
-    include_system_packages: true
