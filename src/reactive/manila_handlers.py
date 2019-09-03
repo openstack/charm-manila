@@ -32,8 +32,8 @@ charms_openstack.charm.use_defaults(
     'charm.installed',
     'amqp.connected',
     'shared-db.connected',
-    'identity-service.available',  # enables SSL support
     'upgrade-charm',
+    'certificates.available',
 )
 
 

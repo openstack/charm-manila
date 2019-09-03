@@ -29,7 +29,7 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             'charm.installed',
             'amqp.connected',
             'shared-db.connected',
-            'identity-service.available',  # enables SSL support
+            'certificates.available',
         ]
         hook_set = {
             'when': {
