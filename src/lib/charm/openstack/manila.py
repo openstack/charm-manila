@@ -185,21 +185,11 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
     service_type_v2 = 'manilav2'
 
     default_service = 'manila-api'
-    services = ['manila-api',
-                'manila-scheduler',
-                'manila-share',
-                'manila-data']
 
     # Note that the hsm interface is optional - defined in config.yaml
     required_relations = ['shared-db', 'amqp', 'identity-service']
 
     adapters_class = ManilaRelationAdapters
-
-    restart_map = {
-        MANILA_CONF: services,
-        MANILA_API_PASTE_CONF: services,
-        MANILA_LOGGING_CONF: services,
-    }
 
     # This is the command to sync the database
     sync_cmd = ['sudo', 'manila-manage', 'db', 'sync']
@@ -221,6 +211,23 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         ]),
     }
 
+    @property
+    def services(self):
+        services = ['manila-api',
+                    'manila-scheduler',
+                    'manila-data']
+        if not self.get_adapter('remote-manila-plugin.available'):
+            services.append('manila-share')
+        return services
+
+    @property
+    def restart_map(self):
+        services = self.services
+        return {
+            MANILA_CONF: services,
+            MANILA_API_PASTE_CONF: services,
+            MANILA_LOGGING_CONF: services,
+        }
     # ha_resources = ['vips', 'haproxy']
 
     # Custom charm configuration
@@ -368,7 +375,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
 
         :returns: list of strings: backend sections that are configured.
         """
-        adapter = self.get_adapter('manila-plugin.available')
+        adapter = self.adapter
         if adapter is None:
             return []
         # adapter.names is a property that provides a list of backend manila
@@ -394,7 +401,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         :param config_file: string, filename for configuration lines
         :returns: list of strings: config lines for `config_file`
         """
-        adapter = self.get_adapter('manila-plugin.available')
+        adapter = self.adapter
         if adapter is None:
             return []
         # get the configuration data for all plugins
@@ -421,7 +428,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
 
         :returns: [list of config files]
         """
-        adapter = self.get_adapter('manila-plugin.available')
+        adapter = self.adapter
         if adapter is None:
             return []
         # get the configuration data for all plugins
@@ -432,6 +439,11 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
             for config_file, chunks in data.items():
                 config_files.add(config_file)
         return list(config_files)
+
+    @property
+    def adapter(self):
+        return self.get_adapter('manila-plugin.available') or \
+            self.get_adapter('remote-manila-plugin.available')
 
 
 class ManilaCharmRocky(ManilaCharm):

@@ -29,3 +29,5 @@ requires:
   manila-plugin:
     interface: manila-plugin
     scope: container
+  remote-manila-plugin:
+    interface: manila-plugin

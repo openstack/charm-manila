@@ -37,8 +37,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                  'identity-service.available',
                                  'amqp.available', ),
                 'register_endpoints': ('identity-service.connected', ),
-                'share_to_manila_plugins_auth': ('identity-service.connected',
-                                                 'manila-plugin.connected', ),
+                'share_to_manila_plugins_auth':
+                    ('identity-service.connected', ),
                 'maybe_do_syncdb': ('shared-db.available',
                                     'manila.config.rendered', ),
                 'config_changed': ('shared-db.available',
@@ -50,8 +50,11 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             },
             'when_any': {
                 'config_changed': ('config-changed',
-                                   'manila-plugin.changed', ),
-
+                                   'manila-plugin.changed',
+                                   'remote-manila-plugin.changed', ),
+                'share_to_manila_plugins_auth': (
+                    'manila-plugin.connected',
+                    'remote-manila-plugin.connected', )
             },
         }
         # test that the hooks were registered via the

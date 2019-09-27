@@ -98,17 +98,12 @@ class TestManilaCharm(Helper):
         return c
 
     def test_install(self):
-        self.patch("charms_openstack.charm.OpenStackCharm.install",
-                   name="install")
-        self.patch("charms_openstack.charm.OpenStackCharm.configure_source",
-                   name="configure_source")
+        self.patch('builtins.super', 'super')
         self.patch("subprocess.check_call", name="check_call")
         self.patch("charms_openstack.charm.OpenStackCharm.assess_status",
                    name="assess_status")
         c = manila.ManilaCharm()
         c.install()
-        self.install.assert_called_once_with()
-        self.configure_source.assert_called_once_with()
         self.check_call.assert_called_once_with(["mkdir", "-p", "/etc/nova"])
         self.assess_status.assert_called_once_with()
 
@@ -236,7 +231,7 @@ class TestManilaCharm(Helper):
         self._patch_get_adapter(c)
         self.out = None
         self.assertEqual(c.configured_backends, [])
-        self.assertEqual(self.var, 'manila-plugin.available')
+        self.assertEqual(self.var, 'remote-manila-plugin.available')
         self.out = mock.Mock()
         self.out.relation.names = ['a', 'b']
         self.assertEqual(c.configured_backends, ['a', 'b'])
@@ -246,7 +241,7 @@ class TestManilaCharm(Helper):
         self._patch_get_adapter(c)
         self.out = None
         self.assertEqual(c.config_lines_for('conf'), [])
-        self.assertEqual(self.var, 'manila-plugin.available')
+        self.assertEqual(self.var, 'remote-manila-plugin.available')
         self.out = mock.Mock()
         self.out.relation.get_configuration_data.return_value = {}
         self.assertEqual(c.config_lines_for('conf'), [])

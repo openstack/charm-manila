@@ -50,15 +50,20 @@ def register_endpoints(keystone):
         manila_charm.assess_status()
 
 
-@charms.reactive.when('identity-service.connected',
-                      'manila-plugin.connected')
-def share_to_manila_plugins_auth(keystone, manila_plugin, *args):
+@charms.reactive.when('identity-service.connected')
+@charms.reactive.when_any('manila-plugin.connected',
+                          'remote-manila-plugin.connected')
+def share_to_manila_plugins_auth():
     """When we have the identity-service and (a) backend plugin, share the auth
     plugin with the back end.
 
     Note that the interface deals with ensurign that each plugin gets the same
     data.
     """
+    keystone = charms.reactive.endpoint_from_flag('identity-service.connected')
+    manila_plugin = \
+        charms.reactive.endpoint_from_flag('manila-plugin.connected') or \
+        charms.reactive.endpoint_from_flag('remote-manila-plugin.connected')
     data = {
         'username': keystone.service_username(),
         'password': keystone.service_password(),
@@ -107,7 +112,9 @@ def render_stuff(*args):
         manila_charm.render_with_interfaces(args)
         manila_charm.assess_status()
         charms.reactive.set_state('manila.config.rendered')
-        manila_plugin = relations.endpoint_from_flag('manila-plugin.changed')
+        manila_plugin = \
+            relations.endpoint_from_flag('manila-plugin.changed') or \
+            relations.endpoint_from_flag('remote-manila-plugin.changed')
         if manila_plugin:
             manila_plugin.clear_changed()
 
@@ -116,7 +123,8 @@ def render_stuff(*args):
                       'identity-service.available',
                       'amqp.available')
 @charms.reactive.when_any('config-changed',
-                          'manila-plugin.changed')
+                          'manila-plugin.changed',
+                          'remote-manila-plugin.changed')
 def config_changed(*args):
     """When the configuration is changed, check that we have all the interfaces
     and then re-render all the configuration files.  Note that this means that
@@ -140,9 +148,14 @@ def update_status():
     handlers will activate it.
     """
     if not os_utils.is_unit_paused_set():
+        with charms_openstack.charm.provide_charm_instance() as manila_charm:
+            if manila_charm.get_adapter('remote-manila-plugin.available'):
+                services = []
+            else:
+                services = ['manila-share']
         state, message = os_utils._ows_check_services_running(
-            services=['manila-share'],
+            services=services,
             ports=None)
-        if state == 'blocked':
+        if state == 'blocked' and services:
             # try to start the 'manila-share' service
             ch_host.service_start('manila-share')
