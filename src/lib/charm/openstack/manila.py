@@ -216,6 +216,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
             ('5', 'pike'),
             ('6', 'queens'),
             ('7', 'rocky'),
+            ('8', 'stein'),
         ]),
     }
 
