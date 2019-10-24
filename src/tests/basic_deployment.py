@@ -26,7 +26,7 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
     A functional test will be performed by a mojo or tempest test.
     """
 
-    def __init__(self, series, openstack=None, source=None, stable=False):
+    def __init__(self, series, openstack=None, source=None, stable=True):
         """Deploy the entire test environment.
         """
         super(ManilaBasicDeployment, self).__init__(
@@ -59,7 +59,8 @@ class ManilaBasicDeployment(OpenStackAmuletDeployment):
              'constraints': {'mem': '3072M'}},
             {'name': 'rabbitmq-server'},
             {'name': 'keystone'},
-            {'name': 'manila-generic'}
+            {'name': 'manila-generic',
+             'location': 'cs:~openstack-charmers/manila-generic'}
         ]
         super(ManilaBasicDeployment, self)._add_services(
             this_service, other_services)
