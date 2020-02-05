@@ -14,7 +14,6 @@ series:
   - xenial
   - bionic
   - eoan
-  - disco
 subordinate: false
 requires:
   shared-db:
