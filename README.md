@@ -1,10 +1,5 @@
 # Manila Source Charm
 
-THIS CHARM IS FOR EXPERIMENTAL USE AT PRESENT.  This is a pre-release charm for
-the Manila service to enable testing and to inform further development. It
-shouldn't be used in production environments yet.  Note that the OpenStack
-manila service *is* production ready (according to their website).
-
 This repository is for the reactive, layered,
 [Manila](https://wiki.openstack.org/wiki/Manila) _source_ charm.
 

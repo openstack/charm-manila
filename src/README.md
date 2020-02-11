@@ -1,21 +1,11 @@
 # Overview
 
-This charm exists to provide an example for Manila integration, for the purpose
-of test and reference.  It is not intended for production use in any case.
-
-It provides the Manila shared file service for an OpenStack Cloud.  It
-installs a single instance that, on its own, can't be used.
+This charm provides the Manila shared file service for an OpenStack Cloud.
 
 In order to use the manila charm, a suitable backend charm is needed to
-configure a share backend.  At the time of writing (Dec 2016) the only backend
-charm available for testing is the 'generic backend' charm called
-'manila-generic'.  This is used to configure a generic fileshare backend that
-can implement an NFS server that then uses a cinder backend block storage
-service to provide the share instances.
-
-Without a backend subordinate charm related to the manila-charm there will be
-no manila backends configured; the manila charm will be stuck in the blocked
-state.
+configure a share backend. Without a backend subordinate charm related to
+the manila-charm there will be no manila backends configured; the manila charm
+will be stuck in the blocked state.
 
 
 ## Manila share backends are configured using subordinate charms
