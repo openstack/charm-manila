@@ -2,8 +2,9 @@ charm_name: manila
 dev_bundles:
 - bionic
 gate_bundles:
-- xenial-mitaka
-- xenial-ocata
+# Manila doesn't support mod-wsgi before Pike
+# - xenial-mitaka
+# - xenial-ocata
 - xenial-pike
 - xenial-queens
 - bionic-queens

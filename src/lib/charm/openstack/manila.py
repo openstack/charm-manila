@@ -18,9 +18,11 @@
 from __future__ import absolute_import
 
 import collections
+import os
 import re
 import subprocess
 
+import charmhelpers.core.host as host
 import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.ip as os_ip
@@ -32,12 +34,16 @@ PACKAGES = ['manila-api',
             'manila-share',
             'python-pymysql',
             'python-apt',  # for subordinate neutron-openvswitch if needed.
+            'apache2',
+            'libapache2-mod-wsgi',
             ]
 
 MANILA_DIR = '/etc/manila/'
 MANILA_CONF = MANILA_DIR + "manila.conf"
 MANILA_LOGGING_CONF = MANILA_DIR + "logging.conf"
 MANILA_API_PASTE_CONF = MANILA_DIR + "api-paste.ini"
+MANILA_WEBSERVER_SITE = 'manila-api'
+MANILA_WSGI_CONF = '/etc/apache2/sites-available/manila-api.conf'
 
 # select the default release function and ssl feature
 charms_openstack.charm.use_defaults('charm.default-select-release')
@@ -213,7 +219,8 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
 
     @property
     def services(self):
-        services = ['manila-api',
+        services = ['apache2',
+                    'haproxy',
                     'manila-scheduler',
                     'manila-data']
         if not self.get_adapter('remote-manila-plugin.available'):
@@ -225,10 +232,12 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         services = self.services
         return {
             MANILA_CONF: services,
-            MANILA_API_PASTE_CONF: services,
+            MANILA_API_PASTE_CONF: ['apache2'],
             MANILA_LOGGING_CONF: services,
+            MANILA_WSGI_CONF: ['apache2'],
         }
-    # ha_resources = ['vips', 'haproxy']
+
+    ha_resources = ['vips', 'haproxy', 'dnsha']
 
     # Custom charm configuration
 
@@ -242,6 +251,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         # this creates the /etc/nova directory for the
         # neutron-openvswitch plugin if needed.
         subprocess.check_call(["mkdir", "-p", "/etc/nova"])
+        host.service_pause('manila-api')
         self.assess_status()
 
     def custom_assess_status_check(self):
@@ -445,6 +455,18 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         return self.get_adapter('manila-plugin.available') or \
             self.get_adapter('remote-manila-plugin.available')
 
+    def enable_webserver_site(self):
+        """Enable Manila API apache2 site if rendered or installed"""
+        if os.path.exists(MANILA_WSGI_CONF):
+            check_enabled = subprocess.call(
+                ['a2query', '-s', MANILA_WEBSERVER_SITE]
+            )
+            if check_enabled != 0:
+                subprocess.check_call(['a2ensite',
+                                       MANILA_WEBSERVER_SITE])
+                host.service_reload('apache2',
+                                    restart_on_failure=True)
+
 
 class ManilaCharmRocky(ManilaCharm):
 
@@ -456,12 +478,15 @@ class ManilaCharmRocky(ManilaCharm):
         'manila-scheduler',
         'manila-share',
         'python3-manila',
+        'apache2',
+        'libapache2-mod-wsgi-py3',
     ]
 
     purge_packages = [
         'python-manila',
         'python-memcache',
         'python-pymysql',
+        'libapache2-mod-wsgi',
     ]
 
     python_version = 3

@@ -43,10 +43,14 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                     'manila.config.rendered', ),
                 'config_changed': ('shared-db.available',
                                    'identity-service.available',
-                                   'amqp.available', )
+                                   'amqp.available', ),
+                'config_rendered': ('db.synced', 'manila.config.rendered',),
+                'cluster_connected': ('ha.connected',)
             },
             'when_not': {
                 'register_endpoints': ('identity-service.available', ),
+                'maybe_do_syncdb': ('db.synced',),
+                'config_rendered': ('config.rendered',)
             },
             'when_any': {
                 'config_changed': ('config-changed',

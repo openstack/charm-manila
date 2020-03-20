@@ -20,21 +20,25 @@ import charmhelpers.core.host as ch_host
 
 import charms.reactive
 import charms.reactive.relations as relations
+import charms_openstack.bus
 import charms_openstack.charm
 
-# This charm's library contains all of the handler code associated with
-# manila -- we need to import it to get the definitions for the charm.
-import charm.openstack.manila  # noqa
+charms_openstack.bus.discover()
 
 
 # Use the charms.openstack defaults for common states and hooks
 charms_openstack.charm.use_defaults(
-    'charm.installed',
     'amqp.connected',
+    'certificates.available',
+    'charm.installed',
+    'cluster.available',
+    'config.rendered',
     'shared-db.connected',
     'upgrade-charm',
     'certificates.available',
     'cluster.available',
+    'config.changed',
+    'update-status',
 )
 
 
@@ -96,6 +100,7 @@ def maybe_do_syncdb(shared_db):
     """
     with charms_openstack.charm.provide_charm_instance() as manila_charm:
         manila_charm.db_sync()
+    charms.reactive.set_state('db.synced')
 
 
 @charms.reactive.when('shared-db.available',
@@ -118,6 +123,7 @@ def render_stuff(*args):
             relations.endpoint_from_flag('remote-manila-plugin.changed')
         if manila_plugin:
             manila_plugin.clear_changed()
+        manila_charm.enable_webserver_site()
 
 
 @charms.reactive.when('shared-db.available',
@@ -160,3 +166,27 @@ def update_status():
         if state == 'blocked' and services:
             # try to start the 'manila-share' service
             ch_host.service_start('manila-share')
+
+
+@charms.reactive.when('db.synced', 'manila.config.rendered')
+@charms.reactive.when_not('config.rendered')
+def config_rendered():
+    """Set the config.rendered state when ready for operation.
+
+    The config.rendered flag is used by the default handlers in
+    charms.openstack to enable / disable services based on the
+    readiness of the deployment. The Manila charm is using this
+    functionalty to ensure that the Manila services start up only
+    after the database has been synced to remove a race condition
+    where the services won't restart after failing several times
+    with missing migrations.
+    """
+    charms.reactive.set_state('config.rendered')
+
+
+@charms.reactive.when('ha.connected')
+def cluster_connected(hacluster):
+    """Configure HA resources in corosync"""
+    with charms_openstack.charm.provide_charm_instance() as manila_charm:
+        manila_charm.configure_ha_resources(hacluster)
+        manila_charm.assess_status()

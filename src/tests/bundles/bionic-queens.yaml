@@ -2,7 +2,7 @@ series: bionic
 services:
   manila:
     charm: ../../../manila
-    num_units: 1
+    num_units: 3
     series: bionic
     options:
       default-share-backend: generic

@@ -1,0 +1,11 @@
+# Add True HA
+applications:
+  manila:
+    options:
+      vip: '{{ OS_VIP00 }}'
+  hacluster:
+    charm: cs:~openstack-charmers-next/hacluster
+    num_units: 0
+relations:
+- - manila
+  - hacluster
