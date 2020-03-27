@@ -34,6 +34,7 @@ charms_openstack.charm.use_defaults(
     'shared-db.connected',
     'upgrade-charm',
     'certificates.available',
+    'cluster.available',
 )
 
 
