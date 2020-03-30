@@ -11,6 +11,8 @@ gate_bundles:
 - ganesha: bionic-rocky
 - ganesha: bionic-stein
 - ganesha: bionic-train
+- ganesha: bionic-ussuri
+- ganesha: focal-ussuri
 smoke_bundles:
 - ganesha: bionic-stein
 target_deploy_status: {}
@@ -27,3 +29,7 @@ configure:
     - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
     - zaza.openstack.charm_tests.keystone.setup.add_demo_user
     - zaza.openstack.charm_tests.manila_ganesha.setup.setup_ganesha_share_type
+tests_options:
+  force_deploy:
+    - focal-ussuri
+

@@ -14,6 +14,7 @@ series:
   - xenial
   - bionic
   - eoan
+  - focal
 subordinate: false
 requires:
   shared-db:
