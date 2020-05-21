@@ -7,17 +7,17 @@ services:
     options:
       default-share-backend: generic
   manila-generic:
-    charm: cs:~openstack-charmers-next/manila-generic
+    charm: cs:~openstack-charmers/manila-generic
     options:
       driver-handles-share-servers: False
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: cs:~openstack-charmers/rabbitmq-server
     num_units: 1
   percona-cluster:
-    charm: cs:~openstack-charmers-next/percona-cluster
+    charm: cs:~openstack-charmers/percona-cluster
     num_units: 1
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: cs:~openstack-charmers/keystone
     num_units: 1
 
 relations:
