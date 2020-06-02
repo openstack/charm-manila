@@ -2,19 +2,20 @@ name: manila
 summary: A REST API for folder shares
 maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
 description: |
- Shared File Systems service provides a set of services for management of
- shared file systems in a multi-tenant cloud environment. The service resembles
- OpenStack block-based storage management from the OpenStack Block Storage
- service project. With the Shared File Systems service, you can create a remote
- file system, mount the file system on your instances, and then read and write
- data from your instances to and from your file system.
+  Shared File Systems service provides a set of services for management of
+  shared file systems in a multi-tenant cloud environment. The service resembles
+  OpenStack block-based storage management from the OpenStack Block Storage
+  service project. With the Shared File Systems service, you can create a remote
+  file system, mount the file system on your instances, and then read and write
+  data from your instances to and from your file system.
 tags:
-  - openstack
+- openstack
 series:
-  - xenial
-  - bionic
-  - eoan
-  - focal
+- xenial
+- bionic
+- eoan
+- focal
+- groovy
 subordinate: false
 requires:
   shared-db:
