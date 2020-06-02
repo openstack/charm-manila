@@ -13,7 +13,6 @@
 # limitations under the License.
 
 # this is just for the reactive handlers and calls into the charm.
-from __future__ import absolute_import
 
 import charmhelpers.contrib.openstack.utils as os_utils
 import charmhelpers.core.host as ch_host
