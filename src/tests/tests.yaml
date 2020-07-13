@@ -1,6 +1,8 @@
 charm_name: manila
 dev_bundles:
 - bionic
+- ganesha: focal-victoria
+- ganesha: groovy-victoria
 gate_bundles:
 # Manila doesn't support mod-wsgi before Pike
 # - xenial-mitaka
@@ -31,5 +33,4 @@ configure:
     - zaza.openstack.charm_tests.manila_ganesha.setup.setup_ganesha_share_type
 tests_options:
   force_deploy:
-    - focal-ussuri
-
+    - groovy-victoria
