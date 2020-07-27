@@ -1,9 +1,8 @@
-# This file is managed centrally.  If you find the need to modify this as a
-# one-off, please don't.  Intead, consult #openstack-charms and ask about
-# requirements management in charms via bot-control.  Thank you.
-coverage>=3.6
-mock>=1.2
-stestr>=2.2.0
-requests>=2.18.4
+# This file is managed centrally by release-tools and should not be modified
+# within individual charm repos.  See the 'global' dir contents for available
+# choices of *requirements.txt files for OpenStack Charms:
+#     https://github.com/openstack-charmers/release-tools
+#
+# Functional Test Requirements (let Zaza's dependencies solve all dependencies here!)
 git+https://github.com/openstack-charmers/zaza.git#egg=zaza
 git+https://github.com/openstack-charmers/zaza-openstack-tests.git#egg=zaza.openstack
