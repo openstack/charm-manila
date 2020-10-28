@@ -114,6 +114,14 @@ def render_stuff(*args):
     was set.
     """
     with charms_openstack.charm.provide_charm_instance() as manila_charm:
+        pre_ssl_enabled = manila_charm.get_state('ssl.enabled')
+        tls = relations.endpoint_from_flag('certificates.available')
+        manila_charm.configure_tls(certificates_interface=tls)
+        if pre_ssl_enabled != manila_charm.get_state('ssl.enabled'):
+            keystone = relations.endpoint_from_flag(
+                'identity-service.available')
+            manila_charm.register_endpoints(keystone)
+
         manila_charm.render_with_interfaces(args)
         manila_charm.assess_status()
         charms.reactive.set_state('manila.config.rendered')
