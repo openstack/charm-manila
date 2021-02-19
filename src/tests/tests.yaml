@@ -2,11 +2,6 @@ charm_name: manila
 dev_bundles:
 - bionic
 gate_bundles:
-# Manila doesn't support mod-wsgi before Pike
-# - xenial-mitaka
-# - xenial-ocata
-- xenial-pike
-- xenial-queens
 - bionic-queens
 - ganesha: bionic-rocky
 - ganesha: bionic-stein
@@ -15,6 +10,12 @@ gate_bundles:
 - ganesha: focal-ussuri
 - ganesha: focal-victoria
 - ganesha: groovy-victoria
+dev_bundles:
+# Manila doesn't support mod-wsgi before Pike
+# - xenial-mitaka
+# - xenial-ocata
+- xenial-pike
+- xenial-queens
 smoke_bundles:
 - ganesha: bionic-stein
 target_deploy_status: {}
