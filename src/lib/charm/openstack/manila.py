@@ -68,12 +68,12 @@ def computed_share_backends(config):
     """Determine the backend protocols that are provided as a string.
 
     This asks the charm class what the backend protocols are, and then provides
-    it as a space separated list of backends.
+    it as a comma separated list of backends.
 
     :param config: the config option on which to look up config options
     :returns: string
     """
-    return ' '.join(config.charm_instance.configured_backends)
+    return ','.join(config.charm_instance.configured_backends)
 
 
 @charms_openstack.adapters.config_property

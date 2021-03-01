@@ -50,7 +50,7 @@ class TestManilaCharmConfigProperties(Helper):
     def test_computed_share_backends(self):
         config = mock.MagicMock()
         config.charm_instance.configured_backends = ["a", "c", "b"]
-        self.assertEqual(manila.computed_share_backends(config), "a c b")
+        self.assertEqual(manila.computed_share_backends(config), "a,c,b")
 
     def test_computed_share_protocols(self):
         config = mock.MagicMock()
