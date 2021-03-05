@@ -10,11 +10,16 @@
         - ganesha-focal-ussuri
         - ganesha-focal-victoria
         - ganesha-groovy-victoria
+        # Wallaby is currently broken because of a change in the default token
+        # type requirements in manila's policy.json that the charm / tests need
+        # to learn to handle
+        #- ganesha-focal-wallaby
+        #- ganesha-hirsute-wallaby
     vars:
       needs_charm_build: true
       charm_build_name: manila
 - job:
-    name: ganesha-bionic-stein
+    name: ganesha-focal-ussuri
     parent: func-target
     dependencies:
       - osci-lint
@@ -23,12 +28,18 @@
       - tox-py37
       - tox-py38
     vars:
-      tox_extra_args: ganesha:bionic-stein
+      tox_extra_args: ganesha:focal-ussuri
 - job:
     name: bionic-queens_manila
     parent: bionic-queens
     dependencies: &smoke-jobs
-      - ganesha-bionic-stein
+      - ganesha-focal-ussuri
+- job:
+    name: ganesha-bionic-stein
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: ganesha:bionic-stein
 - job:
     name: ganesha-bionic-train
     parent: func-target
@@ -42,20 +53,26 @@
     vars:
       tox_extra_args: ganesha:bionic-ussuri
 - job:
-    name: ganesha-focal-ussuri
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:focal-ussuri
-- job:
     name: ganesha-focal-victoria
     parent: func-target
     dependencies: *smoke-jobs
     vars:
       tox_extra_args: ganesha:focal-victoria
 - job:
+    name: ganesha-focal-wallaby
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: ganesha:focal-wallaby
+- job:
     name: ganesha-groovy-victoria
     parent: func-target
     dependencies: *smoke-jobs
     vars:
       tox_extra_args: ganesha:groovy-victoria
+- job:
+    name: ganesha-hirsute-wallaby
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: ganesha:hisute-wallaby

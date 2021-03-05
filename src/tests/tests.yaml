@@ -1,6 +1,5 @@
 charm_name: manila
-dev_bundles:
-- bionic
+
 gate_bundles:
 - bionic-queens
 - ganesha: bionic-rocky
@@ -10,15 +9,25 @@ gate_bundles:
 - ganesha: focal-ussuri
 - ganesha: focal-victoria
 - ganesha: groovy-victoria
+
 dev_bundles:
-# Manila doesn't support mod-wsgi before Pike
-# - xenial-mitaka
-# - xenial-ocata
+- bionic
+# Manila doesn't support mod-wsgi before Pike for mitaka and ocata
+#- xenial-mitaka
+#- xenial-ocata
 - xenial-pike
 - xenial-queens
+# Wallaby is currently broken because of a change in the default token-type
+# requirements in manila's policy.json that the charm / tests need to learn to
+# handle
+- ganesha: focal-wallaby
+- ganesha: hirsute-wallaby
+
 smoke_bundles:
-- ganesha: bionic-stein
+- ganesha: focal-ussuri
+
 target_deploy_status: {}
+
 tests:
   - zaza.openstack.charm_tests.manila.tests.ManilaTests
   - ganesha:
@@ -32,6 +41,7 @@ configure:
     - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
     - zaza.openstack.charm_tests.keystone.setup.add_demo_user
     - zaza.openstack.charm_tests.manila_ganesha.setup.setup_ganesha_share_type
+
 tests_options:
   force_deploy:
-    - groovy-victoria
+    - hirsute-wallaby
