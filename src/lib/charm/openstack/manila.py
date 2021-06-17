@@ -391,7 +391,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
             return []
         # adapter.names is a property that provides a list of backend manila
         # plugin names for the sections
-        return adapter.relation.names
+        return sorted(list(set(adapter.relation.names)))
 
     def config_lines_for(self, config_file):
         """Return the list of configuration lines for `config_file` as returned
