@@ -90,6 +90,9 @@ services:
     num_units: 1
     options:
       openstack-origin: *source
+  nrpe:
+    charm: cs:nrpe
+
 relations:
   - - 'ceph-mon'
     - 'ceph-osd'
@@ -159,3 +162,5 @@ relations:
     - 'percona-cluster:shared-db'
   - - 'placement:identity-service'
     - 'keystone:identity-service'
+  - - 'nrpe:nrpe-external-master'
+    - 'manila:nrpe-external-master'

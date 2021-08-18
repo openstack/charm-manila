@@ -83,6 +83,9 @@ services:
     num_units: 1
     options:
       openstack-origin: *source
+  nrpe:
+    charm: cs:nrpe
+
 relations:
   - - ceph-mon
     - ceph-osd
@@ -144,3 +147,5 @@ relations:
     - 'glance:image-service'
   - - 'nova-cloud-controller:quantum-network-service'
     - 'neutron-gateway:quantum-network-service'
+  - - 'nrpe:nrpe-external-master'
+    - 'manila:nrpe-external-master'

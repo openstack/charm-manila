@@ -61,3 +61,18 @@ options:
     description: |
       The 'default_share_type' must match the configured default_share_type
       set up in manila using 'manila create-type'.
+  nagios_context:
+    type: string
+    default: "juju"
+    description: |
+      Used by the nrpe-external-master subordinate charm. A string that will
+      be prepended to instance names in order to set the hostname in nagios. 
+      With the default value for example the resulting hostname will look
+      like 'juju-myservice-0'. If you are running multiple environments with
+      the same services this allows you to differentiate between them.
+  nagios_servicegroups:
+    type: string
+    default: ""
+    description: |
+      A comma-separated list of nagios servicegroups. If left empty, the
+      nagios_context will be used as the servicegroup

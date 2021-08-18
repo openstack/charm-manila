@@ -42,7 +42,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                    'identity-service.available',
                                    'amqp.available', ),
                 'config_rendered': ('db.synced', 'manila.config.rendered',),
-                'cluster_connected': ('ha.connected',)
+                'cluster_connected': ('ha.connected',),
+                'configure_nrpe': ('config.rendered',)
             },
             'when_not': {
                 'register_endpoints': ('identity-service.available', ),
@@ -55,8 +56,16 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                                    'remote-manila-plugin.changed', ),
                 'share_to_manila_plugins_auth': (
                     'manila-plugin.connected',
-                    'remote-manila-plugin.connected', )
+                    'remote-manila-plugin.connected', ),
+                'configure_nrpe': (
+                    'config.changed.nagios_context',
+                    'config.changed.nagios_servicegroups',
+                    'endpoint.nrpe-external-master.changed',
+                    'nrpe-external-master.available', )
             },
+            'when_none': {
+                'configure_nrpe': ('charm.paused', 'is-update-status-hook', )
+            }
         }
         # test that the hooks were registered via the
         # reactive.barbican_handlers
