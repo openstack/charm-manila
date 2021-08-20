@@ -95,10 +95,10 @@ class TestManilaCharm(Helper):
         return c
 
     def test_install(self):
-        self.patch('builtins.super', 'super')
         self.patch("subprocess.check_call", name="check_call")
         self.patch("charms_openstack.charm.OpenStackCharm.assess_status",
                    name="assess_status")
+        self.patch('builtins.super', name='super')
         c = manila.ManilaCharm()
         c.install()
         self.check_call.assert_called_once_with(["mkdir", "-p", "/etc/nova"])
