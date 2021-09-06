@@ -71,9 +71,9 @@ def share_to_manila_plugins_auth():
     data = {
         'username': keystone.service_username(),
         'password': keystone.service_password(),
-        'project_domain_id': 'default',
+        'project_domain_name': keystone.service_domain(),
         'project_name': 'services',
-        'user_domain_id': 'default',
+        'user_domain_name': keystone.service_domain(),
         'auth_uri': ("{protocol}://{host}:{port}"
                      .format(protocol=keystone.service_protocol(),
                              host=keystone.service_host(),
