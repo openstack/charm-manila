@@ -253,3 +253,22 @@ class TestManilaCharm(Helper):
         self.assertEqual(c.config_lines_for('conf'), ["conf-string", ''])
         self.assertEqual(c.config_lines_for('conf2'), ["conf2-string", ''])
         self.assertEqual(c.config_lines_for('conf3'), ["conf3-string", ''])
+
+    def test_render_nrpe_checks(self):
+        """Test NRPE renders correctly"""
+        self.patch_object(manila.nrpe, 'NRPE')
+        self.patch_object(manila.nrpe, 'add_init_service_checks')
+
+        target = manila.ManilaCharm()
+        target.render_nrpe_checks()
+
+        self.add_init_service_checks.assert_has_calls([
+            mock.call().add_init_service_checks(
+                mock.ANY,
+                target.services,
+                mock.ANY
+            ),
+        ])
+        self.NRPE.assert_has_calls([
+            mock.call().write(),
+        ])

@@ -22,6 +22,7 @@ import re
 import subprocess
 
 import charmhelpers.core.host as host
+import charmhelpers.contrib.charmsupport.nrpe as nrpe
 import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.ip as os_ip
@@ -467,6 +468,15 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
                                        MANILA_WEBSERVER_SITE])
                 host.service_reload('apache2',
                                     restart_on_failure=True)
+
+    def render_nrpe_checks(self):
+        """Configure Nagios NRPE checks."""
+        hostname = nrpe.get_nagios_hostname()
+        current_unit = nrpe.get_nagios_unit_name()
+        charm_nrpe = nrpe.NRPE(hostname=hostname)
+        nrpe.add_init_service_checks(
+            charm_nrpe, self.services, current_unit)
+        charm_nrpe.write()
 
 
 class ManilaCharmRocky(ManilaCharm):

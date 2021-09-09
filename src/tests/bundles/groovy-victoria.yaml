@@ -195,6 +195,9 @@ services:
     to:
       - '23'
 
+  nrpe:
+    charm: cs:nrpe
+
 relations:
   - - 'ceph-mon'
     - 'ceph-osd'
@@ -311,3 +314,6 @@ relations:
 
   - - 'placement:identity-service'
     - 'keystone:identity-service'
+
+  - - 'nrpe:nrpe-external-master'
+    - 'manila:nrpe-external-master'

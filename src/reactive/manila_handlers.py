@@ -197,3 +197,15 @@ def cluster_connected(hacluster):
     with charms_openstack.charm.provide_charm_instance() as manila_charm:
         manila_charm.configure_ha_resources(hacluster)
         manila_charm.assess_status()
+
+
+@charms.reactive.when_none('charm.paused', 'is-update-status-hook')
+@charms.reactive.when('config.rendered')
+@charms.reactive.when_any('config.changed.nagios_context',
+                          'config.changed.nagios_servicegroups',
+                          'endpoint.nrpe-external-master.changed',
+                          'nrpe-external-master.available')
+def configure_nrpe():
+    """Handle config-changed for NRPE options."""
+    with charms_openstack.charm.provide_charm_instance() as manila_charm:
+        manila_charm.render_nrpe_checks()

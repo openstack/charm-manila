@@ -28,6 +28,8 @@ services:
     num_units: 1
     options:
       openstack-origin: *source
+  nrpe:
+    charm: cs:nrpe
 
 relations:
   - - manila:manila-plugin
@@ -40,3 +42,6 @@ relations:
     - percona-cluster
   - - manila
     - percona-cluster
+  - - nrpe:nrpe-external-master
+    - manila:nrpe-external-master
+

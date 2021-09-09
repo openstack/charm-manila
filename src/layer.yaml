@@ -5,6 +5,7 @@ includes:
   - interface:keystone
   - interface:neutron-plugin
   - interface:manila-plugin
+  - interface:nrpe-external-master
 repo: https://github.com/openstack/charm-manila
 options:
   basic:

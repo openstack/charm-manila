@@ -33,3 +33,7 @@ requires:
     scope: container
   remote-manila-plugin:
     interface: manila-plugin
+provides:
+  nrpe-external-master:
+    interface: nrpe-external-master
+    scope: container
