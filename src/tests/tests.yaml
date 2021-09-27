@@ -9,24 +9,35 @@ gate_bundles:
 - ganesha: bionic-ussuri
 - ganesha: focal-ussuri
 - ganesha: focal-victoria
-- ganesha: groovy-victoria
 dev_bundles:
 # Manila doesn't support mod-wsgi before Pike
 # - xenial-mitaka
 # - xenial-ocata
 - xenial-pike
 - xenial-queens
+# Wallaby is currently broken because of a change in the default token-type
+# requirements in manila's policy.json that the charm / tests need to learn to
+# handle
+- ganesha: focal-wallaby
+- ganesha: focal-xena
+- ganesha: groovy-victoria
+- ganesha: hirsute-wallaby
+- ganesha: impish-xena
+
 smoke_bundles:
-- ganesha: bionic-stein
+- ganesha: focal-ussuri
+
 target_deploy_status:
     nrpe:
       workload-status: blocked
       workload-status-message: "Nagios server not configured or related"
+
 tests:
   - zaza.openstack.charm_tests.manila.tests.ManilaTests
   - ganesha:
     - zaza.openstack.charm_tests.manila.tests.ManilaTests
     - zaza.openstack.charm_tests.manila_ganesha.tests.ManilaGaneshaTests
+
 configure:
   - zaza.openstack.charm_tests.keystone.setup.add_demo_user
   - ganesha:
@@ -36,11 +47,14 @@ configure:
     - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
     - zaza.openstack.charm_tests.keystone.setup.add_demo_user
     - zaza.openstack.charm_tests.manila_ganesha.setup.setup_ganesha_share_type
+
 configure_options:
   configure_gateway_ext_port_use_juju_wait: False
+
 tests_options:
   force_deploy:
     # NOTE(lourot): this is needed because the NRPE charm isn't available on
     # non-LTS Ubuntu series. See lp:1933643
     - groovy-victoria
     - hirsute-wallaby
+    - impish-xena
