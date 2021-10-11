@@ -4,26 +4,30 @@ options:
 services:
   manila-ganesha:
     num_units: 1
-    charm: cs:~openstack-charmers-next/manila-ganesha
+    charm: cs:~openstack-charmers/manila-ganesha
     options:
       openstack-origin: *source
+    channel: candidate
   ceph-mon:
-    charm: cs:~openstack-charmers-next/ceph-mon
+    charm: cs:~openstack-charmers/ceph-mon
     num_units: 3
     options:
       source: *source
+    channel: candidate
   ceph-osd:
-    charm: cs:~openstack-charmers-next/ceph-osd
+    charm: cs:~openstack-charmers/ceph-osd
     num_units: 3
     options:
       source: *source
     storage:
       osd-devices: 'cinder,10G'
+    channel: candidate
   ceph-fs:
-    charm: cs:~openstack-charmers-next/ceph-fs
+    charm: cs:~openstack-charmers/ceph-fs
     num_units: 2
     options:
       source: *source
+    channel: candidate
   manila:
     charm: ../../../manila
     num_units: 3
@@ -33,13 +37,14 @@ services:
       default-share-backend: cephfsnfs1
       share-protocols: NFS
   nova-cloud-controller:
-    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    charm: cs:~openstack-charmers/nova-cloud-controller
     num_units: 1
     options:
       network-manager: Neutron
       openstack-origin: *source
+    channel: candidate
   nova-compute:
-    charm: cs:~openstack-charmers-next/nova-compute
+    charm: cs:~openstack-charmers/nova-compute
     num_units: 2
     constraints: mem=8G
     options:
@@ -48,41 +53,49 @@ services:
       enable-resize: true
       migration-auth-type: ssh
       openstack-origin: *source
+    channel: candidate
   glance:
-    charm: cs:~openstack-charmers-next/glance
+    charm: cs:~openstack-charmers/glance
     num_units: 1
     options:
       openstack-origin: *source
+    channel: candidate
   neutron-api:
-    charm: cs:~openstack-charmers-next/neutron-api
+    charm: cs:~openstack-charmers/neutron-api
     num_units: 1
     options:
       flat-network-providers: physnet1
       neutron-security-groups: true
       openstack-origin: *source
+    channel: candidate
   neutron-openvswitch:
-    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    charm: cs:~openstack-charmers/neutron-openvswitch
+    channel: candidate
   neutron-gateway:
-    charm: cs:~openstack-charmers-next/neutron-gateway
+    charm: cs:~openstack-charmers/neutron-gateway
     num_units: 1
     options:
       bridge-mappings: physnet1:br-ex
       openstack-origin: *source
+    channel: candidate
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: cs:~openstack-charmers/rabbitmq-server
     num_units: 1
     options:
       source: *source
+    channel: candidate
   percona-cluster:
-    charm: cs:~openstack-charmers-next/percona-cluster
+    charm: cs:~openstack-charmers/percona-cluster
     num_units: 1
     options:
       source: *source
+    channel: candidate
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: cs:~openstack-charmers/keystone
     num_units: 1
     options:
       openstack-origin: *source
+    channel: candidate
   nrpe:
     charm: cs:nrpe
 

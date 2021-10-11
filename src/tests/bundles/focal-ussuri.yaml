@@ -40,22 +40,29 @@ machines:
 services:
 
   manila-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   manila-ganesha-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   keystone-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   neutron-api-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   nova-cloud-controller-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   glance-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   placement-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
 
   mysql-innodb-cluster:
-    charm: cs:~openstack-charmers-next/mysql-innodb-cluster
+    charm: cs:~openstack-charmers/mysql-innodb-cluster
     num_units: 3
     options:
       source: *openstack-origin
@@ -63,17 +70,19 @@ services:
       - '0'
       - '1'
       - '2'
+    channel: candidate
 
   manila-ganesha:
     num_units: 1
-    charm: cs:~openstack-charmers-next/manila-ganesha
+    charm: cs:~openstack-charmers/manila-ganesha
     options:
       openstack-origin: *openstack-origin
     to:
       - '3'
+    channel: candidate
 
   ceph-mon:
-    charm: cs:~openstack-charmers-next/ceph-mon
+    charm: cs:~openstack-charmers/ceph-mon
     num_units: 3
     options:
       source: *openstack-origin
@@ -81,9 +90,10 @@ services:
       - '4'
       - '5'
       - '6'
+    channel: candidate
 
   ceph-osd:
-    charm: cs:~openstack-charmers-next/ceph-osd
+    charm: cs:~openstack-charmers/ceph-osd
     num_units: 3
     options:
       source: *openstack-origin
@@ -93,15 +103,17 @@ services:
       - '7'
       - '8'
       - '9'
+    channel: candidate
 
   ceph-fs:
-    charm: cs:~openstack-charmers-next/ceph-fs
+    charm: cs:~openstack-charmers/ceph-fs
     num_units: 2
     options:
       source: *openstack-origin
     to:
       - '10'
       - '11'
+    channel: candidate
 
   manila:
     charm: ../../../manila
@@ -116,16 +128,17 @@ services:
       - '14'
 
   nova-cloud-controller:
-    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    charm: cs:~openstack-charmers/nova-cloud-controller
     num_units: 1
     options:
       network-manager: Neutron
       openstack-origin: *openstack-origin
     to:
       - '15'
+    channel: candidate
 
   nova-compute:
-    charm: cs:~openstack-charmers-next/nova-compute
+    charm: cs:~openstack-charmers/nova-compute
     num_units: 2
     storage:
       ephemeral-device: '40G'
@@ -138,17 +151,19 @@ services:
     to:
       - '16'
       - '17'
+    channel: candidate
 
   glance:
-    charm: cs:~openstack-charmers-next/glance
+    charm: cs:~openstack-charmers/glance
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
       - '18'
+    channel: candidate
 
   neutron-api:
-    charm: cs:~openstack-charmers-next/neutron-api
+    charm: cs:~openstack-charmers/neutron-api
     num_units: 1
     options:
       manage-neutron-plugin-legacy-mode: true
@@ -158,42 +173,48 @@ services:
       openstack-origin: *openstack-origin
     to:
       - '19'
+    channel: candidate
 
   neutron-openvswitch:
-    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    charm: cs:~openstack-charmers/neutron-openvswitch
+    channel: candidate
 
   neutron-gateway:
-    charm: cs:~openstack-charmers-next/neutron-gateway
+    charm: cs:~openstack-charmers/neutron-gateway
     num_units: 1
     options:
       bridge-mappings: physnet1:br-ex
       openstack-origin: *openstack-origin
     to:
       - '20'
+    channel: candidate
 
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: cs:~openstack-charmers/keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
       - '21'
+    channel: candidate
 
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: cs:~openstack-charmers/rabbitmq-server
     num_units: 1
     options:
       source: *openstack-origin
     to:
       - '22'
+    channel: candidate
 
   placement:
-    charm: cs:~openstack-charmers-next/placement
+    charm: cs:~openstack-charmers/placement
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
       - '23'
+    channel: candidate
 
   nrpe:
     charm: cs:nrpe
