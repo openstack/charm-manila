@@ -13,25 +13,21 @@ services:
     charm: cs:~openstack-charmers/manila-generic
     options:
       driver-handles-share-servers: False
-    channel: candidate
   rabbitmq-server:
     charm: cs:~openstack-charmers/rabbitmq-server
     num_units: 1
     options:
       source: *source
-    channel: candidate
   percona-cluster:
     charm: cs:~openstack-charmers/percona-cluster
     num_units: 1
     options:
       source: *source
-    channel: candidate
   keystone:
     charm: cs:~openstack-charmers/keystone
     num_units: 1
     options:
       openstack-origin: *source
-    channel: candidate
   nrpe:
     charm: cs:nrpe
 
