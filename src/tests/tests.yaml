@@ -1,25 +1,19 @@
 charm_name: manila
+
 gate_bundles:
-- bionic-queens
-- ganesha: bionic-stein
-- ganesha: bionic-ussuri
-- ganesha: focal-ussuri
-- ganesha: focal-victoria
+- ganesha: focal-xena
+
 dev_bundles:
-- ganesha: bionic-rocky
-- ganesha: bionic-train
 # Wallaby is currently broken because of a change in the default token-type
 # requirements in manila's policy.json that the charm / tests need to learn to
 # handle
-- ganesha: focal-wallaby
 - ganesha: focal-xena
 - ganesha: focal-yoga
-- ganesha: hirsute-wallaby
 - ganesha: impish-xena
 - ganesha: jammy-yoga
 
 smoke_bundles:
-- ganesha: focal-ussuri
+- ganesha: focal-xena
 
 target_deploy_status:
     nrpe:
@@ -49,6 +43,5 @@ tests_options:
   force_deploy:
     # NOTE(lourot): this is needed because the NRPE charm isn't available on
     # non-LTS Ubuntu series. See lp:1933643
-    - hirsute-wallaby
     - impish-xena
     - jammy-yoga

@@ -1,23 +1,14 @@
 - project:
     templates:
-      - charm-yoga-unit-jobs
+      - charm-unit-jobs-py38
+      - charm-unit-jobs-py39
     check:
       jobs:
-        - bionic-queens_manila
-        - ganesha-bionic-stein
-        - ganesha-bionic-ussuri
-        - ganesha-focal-ussuri
-        - ganesha-focal-victoria
         # Wallaby is currently broken because of a change in the default token
         # type requirements in manila's policy.json that the charm / tests need
         # to learn to handle
-        - ganesha-focal-wallaby:
-            voting: false
-        - ganesha-focal-xena:
-            voting: false
+        - ganesha-focal-xena
         - ganesha-focal-yoga:
-            voting: false
-        - ganesha-hirsute-wallaby:
             voting: false
         - ganesha-impish-xena:
             voting: false
@@ -27,83 +18,33 @@
       needs_charm_build: true
       charm_build_name: manila
 - job:
-    name: ganesha-focal-ussuri
+    name: ganesha-focal-xena
     parent: func-target
     dependencies:
       - osci-lint
-      - tox-py36
       - tox-py38
       - tox-py39
-    vars:
-      tox_extra_args: ganesha:focal-ussuri
-- job:
-    name: bionic-queens_manila
-    parent: bionic-queens
-    dependencies: &smoke-jobs
-      - ganesha-focal-ussuri
-- job:
-    name: ganesha-bionic-stein
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:bionic-stein
-- job:
-    name: ganesha-bionic-ussuri
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:bionic-ussuri
-- job:
-    name: ganesha-focal-victoria
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:focal-victoria
-- job:
-    name: ganesha-focal-wallaby
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:focal-wallaby
-- job:
-    name: ganesha-focal-xena
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:focal-xena
-- job:
-    name: ganesha-focal-wallaby
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:focal-wallaby
-- job:
-    name: ganesha-focal-xena
-    parent: func-target
-    dependencies: *smoke-jobs
+      - charm-build
     vars:
       tox_extra_args: ganesha:focal-xena
 - job:
     name: ganesha-focal-yoga
     parent: func-target
-    dependencies: *smoke-jobs
+    dependencies:
+      - ganesha-focal-xena
     vars:
       tox_extra_args: ganesha:focal-yoga
 - job:
-    name: ganesha-hirsute-wallaby
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:hirsute-wallaby
-- job:
     name: ganesha-impish-xena
     parent: func-target
-    dependencies: *smoke-jobs
+    dependencies:
+      - ganesha-focal-xena
     vars:
       tox_extra_args: ganesha:impish-xena
 - job:
     name: ganesha-jammy-yoga
     parent: func-target
-    dependencies: *smoke-jobs
+    dependencies:
+      - ganesha-focal-xena
     vars:
       tox_extra_args: ganesha:jammy-yoga
