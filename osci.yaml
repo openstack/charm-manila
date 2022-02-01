@@ -17,6 +17,8 @@
     vars:
       needs_charm_build: true
       charm_build_name: manila
+      build_type: charmcraft
+
 - job:
     name: ganesha-focal-xena
     parent: func-target

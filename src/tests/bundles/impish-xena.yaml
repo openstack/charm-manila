@@ -1,6 +1,8 @@
 variables:
   openstack-origin: &openstack-origin distro
 
+local_overlay_enabled: False
+
 series: impish
 
 comment:
@@ -116,7 +118,7 @@ services:
     channel: latest/edge
 
   manila:
-    charm: ../../../manila
+    charm: ../../../manila.charm
     num_units: 3
     options:
       default-share-backend: cephfsnfs1
