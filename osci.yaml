@@ -1,61 +1,29 @@
 - project:
     templates:
-      - charm-unit-jobs
+      - charm-unit-jobs-py38
     check:
       jobs:
-        - bionic-queens_manila
-        - ganesha-bionic-stein
-        - ganesha-bionic-train
-        - ganesha-bionic-ussuri
-        - ganesha-focal-ussuri
-        - ganesha-focal-victoria
-        - ganesha-groovy-victoria
+        - ganesha-focal-wallaby
+        - ganesha-focal-xena
     vars:
       needs_charm_build: true
       charm_build_name: manila
+      build_type: charmcraft
 - job:
-    name: ganesha-bionic-stein
+    name: ganesha-focal-wallaby
     parent: func-target
     dependencies:
+      - charm-build
       - osci-lint
-      - tox-py35
-      - tox-py36
-      - tox-py37
       - tox-py38
     vars:
-      tox_extra_args: ganesha:bionic-stein
+      tox_extra_args: ganesha:focal-wallaby
 - job:
-    name: bionic-queens_manila
-    parent: bionic-queens
-    dependencies: &smoke-jobs
-      - ganesha-bionic-stein
-- job:
-    name: ganesha-bionic-train
+    name: ganesha-focal-xena
     parent: func-target
-    dependencies: *smoke-jobs
+    dependencies:
+      - charm-build
+      - osci-lint
+      - tox-py38
     vars:
-      tox_extra_args: ganesha:bionic-train
-- job:
-    name: ganesha-bionic-ussuri
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:bionic-ussuri
-- job:
-    name: ganesha-focal-ussuri
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:focal-ussuri
-- job:
-    name: ganesha-focal-victoria
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:focal-victoria
-- job:
-    name: ganesha-groovy-victoria
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: ganesha:groovy-victoria
+      tox_extra_args: ganesha:focal-xena
