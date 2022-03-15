@@ -501,3 +501,15 @@ class ManilaCharmRocky(ManilaCharm):
     ]
 
     python_version = 3
+
+
+class ManilaCharmXena(ManilaCharmRocky):
+
+    release = 'xena'
+
+    def install(self):
+        super().install()
+        # remove deprecated policy.json in favor of policy in code
+        policy_json = '/etc/manila/policy.json'
+        if os.path.exists(policy_json):
+            os.remove(policy_json)
