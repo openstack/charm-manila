@@ -503,9 +503,9 @@ class ManilaCharmRocky(ManilaCharm):
     python_version = 3
 
 
-class ManilaCharmXena(ManilaCharmRocky):
+class ManilaCharmWallaby(ManilaCharmRocky):
 
-    release = 'xena'
+    release = 'wallaby'
 
     def install(self):
         super().install()
