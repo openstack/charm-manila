@@ -1,7 +1,9 @@
 local_overlay_enabled: False
 
 variables:
-  openstack-origin: &openstack-origin cloud:focal-wallaby
+  # Note(coreycb): Use proposed until the following is fix released
+  #   https://bugs.launchpad.net/bugs/1967895
+  openstack-origin: &openstack-origin cloud:focal-wallaby/proposed
 
 series: focal
 
