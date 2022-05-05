@@ -2,6 +2,7 @@
     templates:
       - charm-unit-jobs-py38
       - charm-unit-jobs-py39
+      - charm-unit-jobs-py310
     check:
       jobs:
         # Wallaby is currently broken because of a change in the default token
