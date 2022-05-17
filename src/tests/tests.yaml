@@ -1,23 +1,12 @@
 charm_name: manila
-dev_bundles:
-- bionic
+dev_bundles: []
 gate_bundles:
-- bionic-queens
-- ganesha: bionic-rocky
-- ganesha: bionic-stein
-- ganesha: bionic-train
-- ganesha: bionic-ussuri
-- ganesha: focal-ussuri
 - ganesha: focal-victoria
-- ganesha: groovy-victoria
-dev_bundles:
+- ganesha: focal-wallaby
+dev_bundles: []
 # Manila doesn't support mod-wsgi before Pike
-# - xenial-mitaka
-# - xenial-ocata
-- xenial-pike
-- xenial-queens
 smoke_bundles:
-- ganesha: bionic-stein
+- ganesha: focal-wallaby
 target_deploy_status:
     nrpe:
       workload-status: blocked
@@ -39,8 +28,4 @@ configure:
 configure_options:
   configure_gateway_ext_port_use_juju_wait: False
 tests_options:
-  force_deploy:
-    # NOTE(lourot): this is needed because the NRPE charm isn't available on
-    # non-LTS Ubuntu series. See lp:1933643
-    - groovy-victoria
-    - hirsute-wallaby
+  force_deploy: []
