@@ -1,9 +1,9 @@
 variables:
-  openstack-origin: &openstack-origin cloud:focal-yoga
+  openstack-origin: &openstack-origin distro
 
 local_overlay_enabled: False
 
-series: focal
+series: kinetic
 
 comment:
 - 'machines section to decide order of deployment. database sooner = faster'
@@ -118,7 +118,7 @@ services:
     channel: latest/edge
 
   manila:
-    charm: ../../../manila_ubuntu-20.04-amd64.charm
+    charm: ../../../manila_ubuntu-22.04-amd64_ubuntu-22.10-amd64.charm
     num_units: 3
     options:
       default-share-backend: cephfsnfs1
@@ -219,7 +219,8 @@ services:
     channel: latest/edge
 
   nrpe:
-    charm: cs:nrpe
+    charm: ch:nrpe
+    channel: latest/edge
 
 relations:
   - - 'ceph-mon'

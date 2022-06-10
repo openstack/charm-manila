@@ -1,45 +1,9 @@
 - project:
     templates:
-      - charm-unit-jobs-py38
-      - charm-unit-jobs-py39
       - charm-unit-jobs-py310
-    check:
-      jobs:
-        # Wallaby is currently broken because of a change in the default token
-        # type requirements in manila's policy.json that the charm / tests need
-        # to learn to handle
-        - ganesha-focal-xena
-        - ganesha-focal-yoga:
-            voting: false
-        - ganesha-jammy-yoga:
-            voting: false
+      - charm-zed-functional-jobs
     vars:
       needs_charm_build: true
       charm_build_name: manila
       build_type: charmcraft
       charmcraft_channel: 2.0/stable
-
-- job:
-    name: ganesha-focal-xena
-    parent: func-target
-    dependencies:
-      - osci-lint
-      - tox-py38
-      - tox-py39
-      - charm-build
-    vars:
-      tox_extra_args: ganesha:focal-xena
-- job:
-    name: ganesha-focal-yoga
-    parent: func-target
-    dependencies:
-      - ganesha-focal-xena
-    vars:
-      tox_extra_args: ganesha:focal-yoga
-- job:
-    name: ganesha-jammy-yoga
-    parent: func-target
-    dependencies:
-      - ganesha-focal-xena
-    vars:
-      tox_extra_args: ganesha:jammy-yoga
