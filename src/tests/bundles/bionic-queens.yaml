@@ -1,24 +1,28 @@
 series: bionic
 services:
   manila:
-    charm: ../../../manila
     num_units: 3
     series: bionic
+    charm: ../../../manila.charm
     options:
       default-share-backend: generic
   manila-generic:
-    charm: cs:~openstack-charmers/manila-generic
+    charm: ch:manila-generic
     options:
       driver-handles-share-servers: False
+    channel: train/edge
   rabbitmq-server:
-    charm: cs:~openstack-charmers/rabbitmq-server
+    charm: ch:rabbitmq-server
     num_units: 1
+    channel: 3.6/edge
   percona-cluster:
-    charm: cs:~openstack-charmers/percona-cluster
+    charm: ch:percona-cluster
     num_units: 1
+    channel: 5.7/edge
   keystone:
-    charm: cs:~openstack-charmers/keystone
+    charm: ch:keystone
     num_units: 1
+    channel: train/edge
   nrpe:
     charm: cs:nrpe
 
