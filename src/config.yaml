@@ -76,3 +76,10 @@ options:
     description: |
       A comma-separated list of nagios servicegroups. If left empty, the
       nagios_context will be used as the servicegroup
+  config-flags:
+    type: string
+    default: ""
+    description: |
+      Setting multiple arbitrary configuration variable for manila.conf file.
+      Any configuration paramiters is comma-separated.
+      Zero or one spaces are allows between tokens.
