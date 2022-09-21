@@ -11,14 +11,13 @@
         - ganesha-focal-xena
         - ganesha-focal-yoga:
             voting: false
-        - ganesha-impish-xena:
-            voting: false
         - ganesha-jammy-yoga:
             voting: false
     vars:
       needs_charm_build: true
       charm_build_name: manila
       build_type: charmcraft
+      charmcraft_channel: 2.0/stable
 
 - job:
     name: ganesha-focal-xena
@@ -37,13 +36,6 @@
       - ganesha-focal-xena
     vars:
       tox_extra_args: ganesha:focal-yoga
-- job:
-    name: ganesha-impish-xena
-    parent: func-target
-    dependencies:
-      - ganesha-focal-xena
-    vars:
-      tox_extra_args: ganesha:impish-xena
 - job:
     name: ganesha-jammy-yoga
     parent: func-target

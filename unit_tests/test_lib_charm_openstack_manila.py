@@ -167,6 +167,8 @@ class TestManilaCharm(Helper):
         # note that this also tests _custom_register_endpoints() indirectly,
         # which means it doesn't require a separate test.
         keystone = mock.MagicMock()
+        relation = mock.MagicMock()
+        keystone.relations.__iter__.return_value = [relation]
         config = {
             'region': 'the_region',
         }
@@ -190,19 +192,18 @@ class TestManilaCharm(Helper):
         self.internal_url_v2.return_value = 'i2'
         self.admin_url_v2.return_value = 'a2'
         c.register_endpoints(keystone)
-        v1 = mock.call(v1_admin_url='a1',
-                       v1_internal_url='i1',
-                       v1_public_url='p1',
-                       v1_region='the_region',
-                       v1_service='manila')
-        v2 = mock.call(v2_admin_url='a2',
-                       v2_internal_url='i2',
-                       v2_public_url='p2',
-                       v2_region='the_region',
-                       v2_service='manilav2')
+        v1 = mock.call({'v1_admin_url': 'a1',
+                        'v1_internal_url': 'i1',
+                        'v1_public_url': 'p1',
+                        'v1_region': 'the_region',
+                        'v1_service': 'manila'})
+        v2 = mock.call({'v2_admin_url': 'a2',
+                        'v2_internal_url': 'i2',
+                        'v2_public_url': 'p2',
+                        'v2_region': 'the_region',
+                        'v2_service': 'manilav2'})
         calls = [v1, v2]
-        keystone.set_local.assert_has_calls(calls)
-        keystone.set_remote.assert_has_calls(calls)
+        relation.to_publish_raw.update.assert_has_calls(calls)
 
     def test_url_endpoints_creation(self):
         # Tests that the endpoint functions call through to the baseclass

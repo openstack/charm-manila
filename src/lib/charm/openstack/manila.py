@@ -350,8 +350,8 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
             '{}_admin_url'.format(prefix): admin_url,
             '{}_region'.format(prefix): region,
         }
-        keystone.set_local(**relation_info)
-        keystone.set_remote(**relation_info)
+        for relation in keystone.relations:
+            relation.to_publish_raw.update(relation_info)
 
     @property
     def public_url(self):
