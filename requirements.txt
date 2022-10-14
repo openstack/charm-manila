@@ -3,6 +3,6 @@
 # choices of *requirements.txt files for OpenStack Charms:
 #     https://github.com/openstack-charmers/release-tools
 #
-git+https://github.com/juju/charm-tools.git
+charm-tools<3.1
 
 simplejson
