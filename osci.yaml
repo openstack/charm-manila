@@ -11,8 +11,6 @@
         - ganesha-focal-xena
         - ganesha-focal-yoga:
             voting: false
-        - ganesha-impish-xena:
-            voting: false
         - ganesha-jammy-yoga:
             voting: false
     vars:
@@ -37,13 +35,6 @@
       - ganesha-focal-xena
     vars:
       tox_extra_args: ganesha:focal-yoga
-- job:
-    name: ganesha-impish-xena
-    parent: func-target
-    dependencies:
-      - ganesha-focal-xena
-    vars:
-      tox_extra_args: ganesha:impish-xena
 - job:
     name: ganesha-jammy-yoga
     parent: func-target

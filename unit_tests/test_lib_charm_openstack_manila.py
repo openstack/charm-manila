@@ -104,10 +104,14 @@ class TestManilaCharm(Helper):
         self.check_call.assert_called_once_with(["mkdir", "-p", "/etc/nova"])
         self.assess_status.assert_called_once_with()
 
-    def _patch_get_adapter(self, c):
+    def _patch_get_adapter(self, c, adapters=None):
         self.patch_object(c, 'get_adapter')
+        if adapters is None:
+            adapters = ['remote-manila-plugin.available']
 
         def _helper(x):
+            if x not in adapters:
+                return None
             self.var = x
             return self.out
 
@@ -124,11 +128,12 @@ class TestManilaCharm(Helper):
         self.assertEqual(c.configured_backends, [])
         self.assertEqual(c.custom_assess_status_check(),
                          ('blocked', 'No share backends configured'))
+        self._patch_get_adapter(c)
         self.out = mock.Mock()
         self.out.relation.names = ['name1']
         self.assertEqual(c.custom_assess_status_check(),
                          ('blocked', "'default-share-backend' is not set"))
-        self.assertEqual(self.var, 'manila-plugin.available')
+        self.assertEqual(self.var, 'remote-manila-plugin.available')
 
     def test_custom_assess_status_check2(self):
         config = {
@@ -222,6 +227,16 @@ class TestManilaCharm(Helper):
         self.assertEqual(c.public_url_v2, 'p1/v2/%(tenant_id)s')
         self.assertEqual(c.internal_url_v2, 'i1/v2/%(tenant_id)s')
         self.assertEqual(c.admin_url_v2, 'a1/v2/%(tenant_id)s')
+
+    def test_configured_backends_local_and_remote(self):
+        c = self._patch_config_and_charm({})
+        self.patch_object(c, 'get_adapter')
+        local_adapter = mock.Mock()
+        local_adapter.relation.names = ['local']
+        remote_adapter = mock.Mock()
+        remote_adapter.relation.names = ['remote']
+        self.get_adapter.side_effect = [local_adapter, remote_adapter]
+        self.assertEqual(c.configured_backends, ['local', 'remote'])
 
     def test_configured_backends(self):
         c = self._patch_config_and_charm({})

@@ -65,9 +65,11 @@ def share_to_manila_plugins_auth():
     data.
     """
     keystone = charms.reactive.endpoint_from_flag('identity-service.connected')
-    manila_plugin = \
-        charms.reactive.endpoint_from_flag('manila-plugin.connected') or \
-        charms.reactive.endpoint_from_flag('remote-manila-plugin.connected')
+    manila_plugins = [
+        relations.endpoint_from_flag('manila-plugin.connected'),
+        relations.endpoint_from_flag('remote-manila-plugin.connected')
+    ]
+
     data = {
         'username': keystone.service_username(),
         'password': keystone.service_password(),
@@ -85,7 +87,9 @@ def share_to_manila_plugins_auth():
         'auth_type': 'password',
     }
     # Set the auth data to be the same for all plugins
-    manila_plugin.set_authentication_data(data)
+    for manila_plugin in manila_plugins:
+        if manila_plugin is not None:
+            manila_plugin.set_authentication_data(data)
 
 
 @charms.reactive.when('shared-db.available',
@@ -125,11 +129,12 @@ def render_stuff(*args):
         manila_charm.render_with_interfaces(args)
         manila_charm.assess_status()
         charms.reactive.set_state('manila.config.rendered')
-        manila_plugin = \
-            relations.endpoint_from_flag('manila-plugin.changed') or \
+        for manila_plugin in [
+            relations.endpoint_from_flag('manila-plugin.changed'),
             relations.endpoint_from_flag('remote-manila-plugin.changed')
-        if manila_plugin:
-            manila_plugin.clear_changed()
+        ]:
+            if manila_plugin is not None:
+                manila_plugin.clear_changed()
         manila_charm.enable_webserver_site()
 
 
@@ -163,10 +168,10 @@ def update_status():
     """
     if not os_utils.is_unit_paused_set():
         with charms_openstack.charm.provide_charm_instance() as manila_charm:
-            if manila_charm.get_adapter('remote-manila-plugin.available'):
-                services = []
-            else:
+            if manila_charm.get_adapter('manila-plugin.connected'):
                 services = ['manila-share']
+            else:
+                services = []
         state, message = os_utils._ows_check_services_running(
             services=services,
             ports=None)

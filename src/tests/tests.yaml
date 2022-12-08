@@ -9,7 +9,6 @@ dev_bundles:
 # handle
 - ganesha: focal-xena
 - ganesha: focal-yoga
-- ganesha: impish-xena
 - ganesha: jammy-yoga
 
 smoke_bundles:
@@ -43,5 +42,4 @@ tests_options:
   force_deploy:
     # NOTE(lourot): this is needed because the NRPE charm isn't available on
     # non-LTS Ubuntu series. See lp:1933643
-    - impish-xena
     - jammy-yoga

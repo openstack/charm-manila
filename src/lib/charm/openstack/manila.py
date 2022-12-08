@@ -44,6 +44,8 @@ MANILA_LOGGING_CONF = MANILA_DIR + "logging.conf"
 MANILA_API_PASTE_CONF = MANILA_DIR + "api-paste.ini"
 MANILA_WEBSERVER_SITE = 'manila-api'
 MANILA_WSGI_CONF = '/etc/apache2/sites-available/manila-api.conf'
+PLUGIN_RELATIONS = ("manila-plugin.available",
+                    "remote-manila-plugin.available",)
 
 # select the default release function and ssl feature
 charms_openstack.charm.use_defaults('charm.default-select-release')
@@ -382,17 +384,15 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         """Return a list of configured backends that come from the associated
         'manila-share.available' state..
 
-        TODO: Note that the first backend that becomes 'available' will set
-        this state.  It's not clear how multiple backends will interact yet!
-
         :returns: list of strings: backend sections that are configured.
         """
-        adapter = self.adapter
-        if adapter is None:
-            return []
         # adapter.names is a property that provides a list of backend manila
         # plugin names for the sections
-        return sorted(list(set(adapter.relation.names)))
+
+        names = []
+        for backend_relation in self.adapters:
+            names.extend(backend_relation.relation.names)
+        return sorted(list(set(names)))
 
     def config_lines_for(self, config_file):
         """Return the list of configuration lines for `config_file` as returned
@@ -413,22 +413,19 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         :param config_file: string, filename for configuration lines
         :returns: list of strings: config lines for `config_file`
         """
-        adapter = self.adapter
-        if adapter is None:
-            return []
-        # get the configuration data for all plugins
-        config_data = adapter.relation.get_configuration_data()
-        # make the config_data <config_file>: {<name>: string} format
-        inverted_config_data = {}
-        for name, config_files in config_data.items():
-            for file, data in config_files.items():
-                if file not in inverted_config_data:
-                    inverted_config_data[file] = {}
-                inverted_config_data[file][name] = data
+        config_lines = []
+        inverted_config_data = collections.defaultdict(dict)
+        for adapter in self.adapters:
+            # get the configuration data for all plugins
+            config_data = adapter.relation.get_configuration_data()
+
+            # make the config_data <config_file>: {<name>: string} format
+            for name, config_files in config_data.items():
+                for file, data in config_files.items():
+                    inverted_config_data[file][name] = data
         # now see if it's the one we want
         if config_file not in inverted_config_data:
             return []
-        config_lines = []
         for name, chunk in inverted_config_data[config_file].items():
             config_lines.append(chunk)
             config_lines.append('')
@@ -440,22 +437,24 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
 
         :returns: [list of config files]
         """
-        adapter = self.adapter
-        if adapter is None:
-            return []
-        # get the configuration data for all plugins
-        config_data = adapter.relation.get_configuration_data()
 
         config_files = set()
-        for name, data in config_data.items():
-            for config_file, chunks in data.items():
-                config_files.add(config_file)
+        for adapter in self.adapters:
+            # get the configuration data for all plugins
+            config_data = adapter.relation.get_configuration_data()
+
+            for name, data in config_data.items():
+                for config_file in data.keys():
+                    config_files.add(config_file)
         return list(config_files)
 
     @property
-    def adapter(self):
-        return self.get_adapter('manila-plugin.available') or \
-            self.get_adapter('remote-manila-plugin.available')
+    def adapters(self):
+        return [
+            adapter
+            for adapter in map(self.get_adapter, PLUGIN_RELATIONS)
+            if adapter is not None
+        ]
 
     def enable_webserver_site(self):
         """Enable Manila API apache2 site if rendered or installed"""
