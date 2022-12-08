@@ -7,6 +7,8 @@
 # Need tox to be available from tox... inception yes, but its a workaround for now
 tox
 
+jsonschema<4.18.0   # jsonschema 4.18.0 depends on Rust (via rpds-py)
+
 # Functional Test Requirements (let Zaza's dependencies solve all dependencies here!)
 git+https://github.com/openstack-charmers/zaza.git@stable/zed#egg=zaza
 git+https://github.com/openstack-charmers/zaza-openstack-tests.git@stable/zed#egg=zaza.openstack

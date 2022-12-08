@@ -72,6 +72,7 @@ services:
       - '2'
     channel: 8.0/edge
 
+  # manila backends
   manila-ganesha:
     num_units: 1
     charm: ch:manila-ganesha
@@ -80,6 +81,11 @@ services:
     to:
       - '3'
     channel: zed/edge
+  manila-generic:
+    charm: ch:manila-generic
+    channel: zed/edge
+    options:
+      driver-handles-share-servers: False
 
   ceph-mon:
     charm: ch:ceph-mon
@@ -241,6 +247,8 @@ relations:
 
   - - 'manila'
     - 'manila-ganesha'
+  - - 'manila:manila-plugin'
+    - 'manila-generic:manila-plugin'
 
   - - 'manila-ganesha:shared-db'
     - 'manila-ganesha-mysql-router:shared-db'
