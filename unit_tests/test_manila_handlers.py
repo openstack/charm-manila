@@ -101,12 +101,13 @@ class TestRenderStuff(test_utils.PatchHelper):
 
         tls = mock.MagicMock()
         manila_plugin = mock.MagicMock()
+        remote_manila_plugin = mock.MagicMock()
         keystone = mock.MagicMock()
         flags_to_endpoints = {
             'certificates.available': tls,
             'identity-service.available': keystone,
             'manila-plugin.changed': manila_plugin,
-            'remote-manila-plugin.changed': manila_plugin,
+            'remote-manila-plugin.changed': remote_manila_plugin,
         }
 
         def fake_endpoint_from_flag(flag):
@@ -121,6 +122,7 @@ class TestRenderStuff(test_utils.PatchHelper):
         manila_charm.assess_status.assert_called_once_with()
         self.set_state.assert_called_once_with('manila.config.rendered')
         manila_plugin.clear_changed.assert_called_once_with()
+        remote_manila_plugin.clear_changed.assert_called_once_with()
         manila_charm.configure_tls.assert_called_once_with(
             certificates_interface=tls)
         manila_charm.register_endpoints.assert_called_once_with(keystone)
@@ -132,12 +134,13 @@ class TestRenderStuff(test_utils.PatchHelper):
 
         tls = mock.MagicMock()
         manila_plugin = mock.MagicMock()
+        remote_manila_plugin = mock.MagicMock()
         keystone = mock.MagicMock()
         flags_to_endpoints = {
             'certificates.available': tls,
             'identity-service.available': keystone,
             'manila-plugin.changed': manila_plugin,
-            'remote-manila-plugin.changed': manila_plugin,
+            'remote-manila-plugin.changed': remote_manila_plugin,
         }
 
         def fake_endpoint_from_flag(flag):
@@ -152,6 +155,7 @@ class TestRenderStuff(test_utils.PatchHelper):
         manila_charm.assess_status.assert_called_once_with()
         self.set_state.assert_called_once_with('manila.config.rendered')
         manila_plugin.clear_changed.assert_called_once_with()
+        remote_manila_plugin.clear_changed.assert_called_once_with()
         manila_charm.configure_tls.assert_called_once_with(
             certificates_interface=tls)
         manila_charm.register_endpoints.assert_not_called()
