@@ -5,7 +5,6 @@ gate_bundles:
 
 dev_bundles:
 - jammy-antelope
-- kinetic-zed
 - lunar-antelope
 
 smoke_bundles:
@@ -36,5 +35,4 @@ tests_options:
     # https://bugs.launchpad.net/charm-nrpe/+bug/1968008
     - jammy-zed
     - jammy-antelope
-    - kinetic-zed
     - lunar-antelope
