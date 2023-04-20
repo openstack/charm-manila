@@ -43,36 +43,36 @@ services:
 
   manila-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   manila-ganesha-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   keystone-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   neutron-api-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   nova-cloud-controller-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   glance-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   placement-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
 
   mysql-innodb-cluster:
     charm: ch:mysql-innodb-cluster
     num_units: 3
     options:
-      source: *openstack-origin
+      source: distro
     to:
       - '0'
       - '1'
       - '2'
-    channel: latest/edge
+    channel: 8.0/edge
 
   manila-ganesha:
     num_units: 1
@@ -81,7 +81,7 @@ services:
       openstack-origin: *openstack-origin
     to:
       - '3'
-    channel: latest/edge
+    channel: 2023.1/edge
 
   ceph-mon:
     charm: ch:ceph-mon
@@ -92,7 +92,7 @@ services:
       - '4'
       - '5'
       - '6'
-    channel: latest/edge
+    channel: quincy/edge
 
   ceph-osd:
     charm: ch:ceph-osd
@@ -105,7 +105,7 @@ services:
       - '7'
       - '8'
       - '9'
-    channel: latest/edge
+    channel: quincy/edge
 
   ceph-fs:
     charm: ch:ceph-fs
@@ -115,7 +115,7 @@ services:
     to:
       - '10'
       - '11'
-    channel: latest/edge
+    channel: quincy/edge
 
   manila:
     charm: ../../../manila_ubuntu-22.04-amd64_ubuntu-22.10-amd64_ubuntu-23.04-amd64.charm
@@ -137,7 +137,7 @@ services:
       openstack-origin: *openstack-origin
     to:
       - '15'
-    channel: latest/edge
+    channel: 2023.1/edge
 
   nova-compute:
     charm: ch:nova-compute
@@ -153,7 +153,7 @@ services:
     to:
       - '16'
       - '17'
-    channel: latest/edge
+    channel: 2023.1/edge
 
   glance:
     charm: ch:glance
@@ -162,7 +162,7 @@ services:
       openstack-origin: *openstack-origin
     to:
       - '18'
-    channel: latest/edge
+    channel: 2023.1/edge
 
   neutron-api:
     charm: ch:neutron-api
@@ -175,11 +175,11 @@ services:
       openstack-origin: *openstack-origin
     to:
       - '19'
-    channel: latest/edge
+    channel: 2023.1/edge
 
   neutron-openvswitch:
     charm: ch:neutron-openvswitch
-    channel: latest/edge
+    channel: 2023.1/edge
 
   neutron-gateway:
     charm: ch:neutron-gateway
@@ -189,7 +189,7 @@ services:
       openstack-origin: *openstack-origin
     to:
       - '20'
-    channel: latest/edge
+    channel: 2023.1/edge
 
   keystone:
     charm: ch:keystone
@@ -198,14 +198,14 @@ services:
       openstack-origin: *openstack-origin
     to:
       - '21'
-    channel: latest/edge
+    channel: 2023.1/edge
 
   rabbitmq-server:
     charm: ch:rabbitmq-server
     num_units: 1
     to:
       - '22'
-    channel: latest/edge
+    channel: 3.9/edge
 
   placement:
     charm: ch:placement
@@ -214,7 +214,7 @@ services:
       openstack-origin: *openstack-origin
     to:
       - '23'
-    channel: latest/edge
+    channel: 2023.1/edge
 
   nrpe:
     charm: ch:nrpe
