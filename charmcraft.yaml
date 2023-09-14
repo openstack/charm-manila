@@ -13,6 +13,7 @@ parts:
       - libssl-dev
       - rustc
       - cargo
+      - pkg-config
     source: src/
     build-snaps:
       - charm/latest/edge
