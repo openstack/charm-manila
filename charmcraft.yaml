@@ -10,6 +10,7 @@ parts:
       - libssl-dev
       - rustc
       - cargo
+      - pkg-config
     build-environment:
       - CHARM_INTERFACES_DIR: /root/project/interfaces/
       - CHARM_LAYERS_DIR: /root/project/layers/
