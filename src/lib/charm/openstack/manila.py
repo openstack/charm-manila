@@ -44,8 +44,10 @@ MANILA_LOGGING_CONF = MANILA_DIR + "logging.conf"
 MANILA_API_PASTE_CONF = MANILA_DIR + "api-paste.ini"
 MANILA_WEBSERVER_SITE = 'manila-api'
 MANILA_WSGI_CONF = '/etc/apache2/sites-available/manila-api.conf'
-PLUGIN_RELATIONS = ("manila-plugin.available",
-                    "remote-manila-plugin.available",)
+LOCAL_PLUGIN_RELATION = "manila-plugin.available"
+REMOTE_PLUGIN_RELATION = "remote-manila-plugin.available"
+PLUGIN_RELATIONS = (LOCAL_PLUGIN_RELATION,
+                    REMOTE_PLUGIN_RELATION,)
 
 # select the default release function and ssl feature
 charms_openstack.charm.use_defaults('charm.default-select-release')
@@ -66,17 +68,21 @@ def strip_join(s, divider=" "):
 
 ###
 # Compute some options to help with template rendering
+###
+
 @charms_openstack.adapters.config_property
-def computed_share_backends(config):
+def computed_local_share_backends(config):
     """Determine the backend protocols that are provided as a string.
 
     This asks the charm class what the backend protocols are, and then provides
-    it as a comma separated list of backends.
+    it as a comma separated list of backends for the local share service. This
+    does not include the remote backends (i.e. other non-local units running
+    manila-share.service)
 
     :param config: the config option on which to look up config options
     :returns: string
     """
-    return ','.join(config.charm_instance.configured_backends)
+    return ','.join(config.charm_instance.configured_local_backends)
 
 
 @charms_openstack.adapters.config_property
@@ -227,7 +233,9 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
                     'haproxy',
                     'manila-scheduler',
                     'manila-data']
-        if not self.get_adapter('remote-manila-plugin.available'):
+        # BUG: #2012457: only start manila-share if a local share server is
+        # going to be configured.
+        if self.get_adapter(LOCAL_PLUGIN_RELATION):
             services.append('manila-share')
         return services
 
@@ -267,7 +275,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
             there is a problem. Or (None, None) if there are no issues.
         """
         options = self.options  # tiny optimisation for less typing.
-        backends = options.computed_share_backends
+        backends = self.all_backends
         if not backends:
             return 'blocked', 'No share backends configured'
         default_share_backend = options.default_share_backend
@@ -380,19 +388,40 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         return super().internal_url + "/v2/%(tenant_id)s"
 
     @property
-    def configured_backends(self):
+    def configured_local_backends(self):
         """Return a list of configured backends that come from the associated
         'manila-share.available' state..
+
+        Note, that this mustn't contain the remote backends as they are share
+        server specific (e.g. running manila-share service) and if they are
+        included then the share-service wont' start.
 
         :returns: list of strings: backend sections that are configured.
         """
         # adapter.names is a property that provides a list of backend manila
         # plugin names for the sections
+        try:
+            # if self.local_adapter is None, the raises AttributeError when
+            # trying to access 'relation'
+            return sorted(set(self.local_manila_plugin_adapter.relation.names))
+        except AttributeError:
+            return []
 
+    @property
+    def all_backends(self):
+        """Return a list of all configured backends.
+
+        This is obtained from both of the manila-share adapter and the
+        remote-manila-share adapter.
+
+        :returns: list of strings: backend sections that are configured.
+        """
         names = []
-        for backend_relation in self.adapters:
-            names.extend(backend_relation.relation.names)
-        return sorted(list(set(names)))
+        for manila_plugin_adapter in [self.local_manila_plugin_adapter,
+                                      self.remote_manila_plugin_adapter]:
+            if manila_plugin_adapter:
+                names.extend(manila_plugin_adapter.relation.names)
+        return sorted(set(names))
 
     def config_lines_for(self, config_file):
         """Return the list of configuration lines for `config_file` as returned
@@ -415,7 +444,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         """
         config_lines = []
         inverted_config_data = collections.defaultdict(dict)
-        for adapter in self.adapters:
+        for adapter in self.manila_plugin_adapters:
             # get the configuration data for all plugins
             config_data = adapter.relation.get_configuration_data()
 
@@ -439,7 +468,7 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         """
 
         config_files = set()
-        for adapter in self.adapters:
+        for adapter in self.manila_plugin_adapters:
             # get the configuration data for all plugins
             config_data = adapter.relation.get_configuration_data()
 
@@ -449,12 +478,36 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
         return list(config_files)
 
     @property
-    def adapters(self):
+    def manila_plugin_adapters(self):
+        """Return a list of manila-plugin adapters (local and remote).
+
+        :returns: the list of adapters, if available.
+        :rtype: List[OpenStackRelationAdapter]
+        """
         return [
             adapter
-            for adapter in map(self.get_adapter, PLUGIN_RELATIONS)
+            for adapter in [self.local_manila_plugin_adapter,
+                            self.remote_manila_plugin_adapter]
             if adapter is not None
         ]
+
+    @property
+    def local_manila_plugin_adapter(self):
+        """Return the local manila-plugin adapter or None.
+
+        :returns: the adapters, if available.
+        :rtype: OpenStackRelationAdapter
+        """
+        return self.get_adapter(LOCAL_PLUGIN_RELATION)
+
+    @property
+    def remote_manila_plugin_adapter(self):
+        """Return the remote manila-plugin adapter or None.
+
+        :returns: the adapters, if available.
+        :rtype: OpenStackRelationAdapter
+        """
+        return self.get_adapter(REMOTE_PLUGIN_RELATION)
 
     def enable_webserver_site(self):
         """Enable Manila API apache2 site if rendered or installed"""
