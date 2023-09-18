@@ -47,10 +47,10 @@ class TestManilaCharmUtilities(Helper):
 
 class TestManilaCharmConfigProperties(Helper):
 
-    def test_computed_share_backends(self):
+    def test_computed_local_share_backends(self):
         config = mock.MagicMock()
-        config.charm_instance.configured_backends = ["a", "c", "b"]
-        self.assertEqual(manila.computed_share_backends(config), "a,c,b")
+        config.charm_instance.configured_local_backends = ["a", "c", "b"]
+        self.assertEqual(manila.computed_local_share_backends(config), "a,c,b")
 
     def test_computed_share_protocols(self):
         config = mock.MagicMock()
@@ -107,7 +107,7 @@ class TestManilaCharm(Helper):
     def _patch_get_adapter(self, c, adapters=None):
         self.patch_object(c, 'get_adapter')
         if adapters is None:
-            adapters = ['remote-manila-plugin.available']
+            adapters = ['manila-plugin.available']
 
         def _helper(x):
             if x not in adapters:
@@ -125,7 +125,7 @@ class TestManilaCharm(Helper):
         self._patch_get_adapter(c)
         self.out = None
 
-        self.assertEqual(c.configured_backends, [])
+        self.assertEqual(c.configured_local_backends, [])
         self.assertEqual(c.custom_assess_status_check(),
                          ('blocked', 'No share backends configured'))
         self._patch_get_adapter(c)
@@ -133,7 +133,7 @@ class TestManilaCharm(Helper):
         self.out.relation.names = ['name1']
         self.assertEqual(c.custom_assess_status_check(),
                          ('blocked', "'default-share-backend' is not set"))
-        self.assertEqual(self.var, 'remote-manila-plugin.available')
+        self.assertEqual(self.var, 'manila-plugin.available')
 
     def test_custom_assess_status_check2(self):
         config = {
@@ -237,24 +237,36 @@ class TestManilaCharm(Helper):
         remote_adapter = mock.Mock()
         remote_adapter.relation.names = ['remote']
         self.get_adapter.side_effect = [local_adapter, remote_adapter]
-        self.assertEqual(c.configured_backends, ['local', 'remote'])
+        # note that the ONLY local backends show up for the share-server
+        self.assertEqual(c.configured_local_backends, ['local'])
 
-    def test_configured_backends(self):
+    def test_configured_local_backends(self):
         c = self._patch_config_and_charm({})
         self._patch_get_adapter(c)
         self.out = None
-        self.assertEqual(c.configured_backends, [])
-        self.assertEqual(self.var, 'remote-manila-plugin.available')
+        self.assertEqual(c.configured_local_backends, [])
+        self.assertEqual(self.var, 'manila-plugin.available')
         self.out = mock.Mock()
         self.out.relation.names = ['a', 'b']
-        self.assertEqual(c.configured_backends, ['a', 'b'])
+        self.assertEqual(c.configured_local_backends, ['a', 'b'])
+
+    def test_all_backends(self):
+        c = self._patch_config_and_charm({})
+        self.patch_object(c, 'get_adapter')
+        local_adapter = mock.Mock()
+        local_adapter.relation.names = ['local']
+        remote_adapter = mock.Mock()
+        remote_adapter.relation.names = ['remote']
+        self.get_adapter.side_effect = [local_adapter, remote_adapter]
+        # note that the ONLY local backends show up for the share-server
+        self.assertEqual(c.all_backends, ['local', 'remote'])
 
     def test_config_lines_for(self):
         c = self._patch_config_and_charm({})
         self._patch_get_adapter(c)
         self.out = None
         self.assertEqual(c.config_lines_for('conf'), [])
-        self.assertEqual(self.var, 'remote-manila-plugin.available')
+        self.assertEqual(self.var, 'manila-plugin.available')
         self.out = mock.Mock()
         self.out.relation.get_configuration_data.return_value = {}
         self.assertEqual(c.config_lines_for('conf'), [])
@@ -288,3 +300,39 @@ class TestManilaCharm(Helper):
         self.NRPE.assert_has_calls([
             mock.call().write(),
         ])
+
+    def test_manila_plugin_adapters__local(self):
+        c = self._patch_config_and_charm({})
+        self.patch_object(c, 'get_adapter')
+        local_adapter = mock.Mock()
+        local_adapter.relation.names = ['local']
+        self.get_adapter.side_effect = [local_adapter, None]
+        self.assertEqual(c.manila_plugin_adapters, [local_adapter])
+        self.get_adapter.assert_has_calls([
+            mock.call(manila.LOCAL_PLUGIN_RELATION),
+            mock.call(manila.REMOTE_PLUGIN_RELATION)])
+
+    def test_manila_plugin_adapters__remote(self):
+        c = self._patch_config_and_charm({})
+        self.patch_object(c, 'get_adapter')
+        remote_adapter = mock.Mock()
+        remote_adapter.relation.names = ['remote']
+        self.get_adapter.side_effect = [None, remote_adapter]
+        self.assertEqual(c.manila_plugin_adapters, [remote_adapter])
+        self.get_adapter.assert_has_calls([
+            mock.call(manila.LOCAL_PLUGIN_RELATION),
+            mock.call(manila.REMOTE_PLUGIN_RELATION)])
+
+    def test_manila_plugin_adapters__both(self):
+        c = self._patch_config_and_charm({})
+        self.patch_object(c, 'get_adapter')
+        local_adapter = mock.Mock()
+        local_adapter.relation.names = ['local']
+        remote_adapter = mock.Mock()
+        remote_adapter.relation.names = ['remote']
+        self.get_adapter.side_effect = [local_adapter, remote_adapter]
+        self.assertEqual(c.manila_plugin_adapters,
+                         [local_adapter, remote_adapter])
+        self.get_adapter.assert_has_calls([
+            mock.call(manila.LOCAL_PLUGIN_RELATION),
+            mock.call(manila.REMOTE_PLUGIN_RELATION)])
