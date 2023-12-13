@@ -76,3 +76,11 @@ options:
     description: |
       A comma-separated list of nagios servicegroups. If left empty, the
       nagios_context will be used as the servicegroup
+  scheduler-default-filters:
+    type: string
+    default: ""
+    description: |
+      List of comma-separated filter class names to use for filtering hosts
+      when not specified in the request.
+      If not set, the default Manila filters will be used. Those might change
+      based on OpenStack release.
