@@ -83,3 +83,11 @@ options:
       Setting multiple arbitrary configuration variable for manila.conf file.
       Any configuration paramiters is comma-separated.
       Zero or one spaces are allows between tokens.
+  scheduler-default-filters:
+    type: string
+    default: ""
+    description: |
+      List of comma-separated filter class names to use for filtering hosts
+      when not specified in the request.
+      If not set, the default Manila filters will be used. Those might change
+      based on OpenStack release.
