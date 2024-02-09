@@ -1,20 +1,17 @@
 charm_name: manila
 
 gate_bundles:
-- jammy-antelope
-
+  - jammy-antelope
+  - jammy-bobcat
+  - jammy-caracal
 dev_bundles:
-- jammy-bobcat
-- lunar-antelope
-- mantic-bobcat
-
+  - noble-caracal
 smoke_bundles:
-- jammy-antelope
-
+  - jammy-caracal
 target_deploy_status:
-    nrpe:
-      workload-status: blocked
-      workload-status-message-prefix: "Nagios server not configured or related"
+  nrpe:
+    workload-status: blocked
+    workload-status-message-prefix: "Nagios server not configured or related"
 
 tests:
   - zaza.openstack.charm_tests.manila.tests.ManilaTests
@@ -28,13 +25,10 @@ configure:
   - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
   - zaza.openstack.charm_tests.manila_ganesha.setup.setup_ganesha_share_type
 configure_options:
-  configure_gateway_ext_port_use_juju_wait: False
+  configure_gateway_ext_port_use_juju_wait: false
 
 tests_options:
   force_deploy:
     # nrpe charm doesn't support jammy+ and needs to be force installed
     # https://bugs.launchpad.net/charm-nrpe/+bug/1968008
-    - jammy-antelope
-    - jammy-bobcat
-    - lunar-antelope
-    - mantic-bobcat
+    - noble-caracal
