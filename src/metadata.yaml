@@ -10,8 +10,6 @@ description: |
   data from your instances to and from your file system.
 tags:
   - openstack
-series:
-  - jammy
 subordinate: false
 requires:
   shared-db:

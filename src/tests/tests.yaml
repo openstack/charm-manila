@@ -1,13 +1,11 @@
 charm_name: manila
 
 gate_bundles:
-  - jammy-antelope
-  - jammy-bobcat
-  - jammy-caracal
+  - noble-caracal
 dev_bundles:
   - noble-caracal
 smoke_bundles:
-  - jammy-caracal
+  - noble-caracal
 target_deploy_status:
   nrpe:
     workload-status: blocked
