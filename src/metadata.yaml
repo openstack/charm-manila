@@ -9,9 +9,10 @@ description: |
   file system, mount the file system on your instances, and then read and write
   data from your instances to and from your file system.
 tags:
-  - openstack
+- openstack
 series:
-  - jammy
+- jammy
+- noble
 subordinate: false
 requires:
   shared-db:
