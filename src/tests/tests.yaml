@@ -1,7 +1,6 @@
 charm_name: manila
 
 gate_bundles:
-  - jammy-antelope
   - jammy-bobcat
   - jammy-caracal
 dev_bundles:
