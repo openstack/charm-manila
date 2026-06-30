@@ -39,7 +39,7 @@ machines:
   '22':
   '23':
 
-services:
+applications:
 
   manila-mysql-router:
     charm: ch:mysql-router
@@ -219,7 +219,7 @@ services:
     channel: yoga/edge
 
   nrpe:
-    charm: cs:nrpe
+    charm: ch:nrpe
 
 relations:
   - - 'ceph-mon'
