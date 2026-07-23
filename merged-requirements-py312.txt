@@ -8,9 +8,9 @@ attrs==26.1.0
     # via jsonschema
 blessings==1.7
     # via charm-tools
-certifi==2026.5.20
+certifi==2026.7.22
     # via requests
-cffi==2.0.0
+cffi==2.1.0
     # via cryptography
 charm-tools @ git+https://github.com/juju/charm-tools.git
     # via -r requirements.in
@@ -20,7 +20,7 @@ charms-openstack @ git+https://github.com/openstack/charms.openstack.git@stable/
     # via -r test-requirements.in
 charms-reactive==1.5.3
     # via -r test-requirements.in
-charset-normalizer==3.4.7
+charset-normalizer==3.4.9
     # via requests
 cheetah3==3.2.6.post1
     # via charm-tools
@@ -32,7 +32,7 @@ cmd2==0.8.9
     # via cliff
 colander==1.8.3
     # via charm-tools
-coverage==7.14.1
+coverage==7.15.2
     # via -r test-requirements.in
 cryptography==3.3.2
     # via
@@ -40,11 +40,11 @@ cryptography==3.3.2
     #   secretstorage
 dict2colander==0.2
     # via charm-tools
-distlib==0.4.2
+distlib==0.4.3
     # via virtualenv
 extras==1.0.0
     # via testtools
-filelock==3.29.3
+filelock==3.32.0
     # via virtualenv
 fixtures==4.3.2
     # via
@@ -106,7 +106,7 @@ pbr==5.6.0
     #   testtools
 pip==26.1.2
     # via charm-tools
-platformdirs==4.10.0
+platformdirs==4.11.0
     # via virtualenv
 prettytable==0.7.2
     # via cliff
@@ -114,7 +114,7 @@ psutil==7.2.2
     # via -r test-requirements.in
 psycopg2-binary==2.9.12
     # via -r test-requirements.in
-pyaml==26.2.1
+pyaml==26.7.0
     # via charms-reactive
 pycodestyle==2.12.1
     # via flake8
@@ -171,7 +171,7 @@ six==1.17.0
     #   cryptography
 stestr==4.2.1
     # via -r test-requirements.in
-stevedore==5.8.0
+stevedore==5.9.0
     # via cliff
 stuf==0.9.16
     # via otherstuf
@@ -182,11 +182,11 @@ testtools==2.5.0
     #   -r test-requirements.in
     #   python-subunit
     #   stestr
-tomlkit==0.15.0
+tomlkit==0.15.1
     # via stestr
 translationstring==1.4
     # via colander
-types-setuptools==82.0.0.20260518
+types-setuptools==83.0.0.20260716
     # via requirements-parser
 urllib3==2.7.0
     # via requests
@@ -194,5 +194,5 @@ virtualenv==20.39.1
     # via charm-tools
 voluptuous==0.16.0
     # via stestr
-wcwidth==0.8.1
+wcwidth==0.8.2
     # via cmd2
