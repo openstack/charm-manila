@@ -18,6 +18,7 @@ target_deploy_status:
 tests:
   - zaza.openstack.charm_tests.manila.tests.ManilaTests
   - zaza.openstack.charm_tests.manila_ganesha.tests.ManilaGaneshaTests
+  - zaza.openstack.charm_tests.policyd.tests.ManilaTests
 
 configure:
   - zaza.openstack.charm_tests.keystone.setup.add_demo_user
@@ -35,3 +36,5 @@ tests_options:
     # https://bugs.launchpad.net/charm-nrpe/+bug/1968008
     - jammy-yoga
     - jammy-zed
+  policyd:
+    service: manila

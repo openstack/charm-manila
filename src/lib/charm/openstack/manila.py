@@ -26,6 +26,7 @@ import charmhelpers.contrib.charmsupport.nrpe as nrpe
 import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.ip as os_ip
+import charms_openstack.plugins as ch_plugins
 
 # note that manila-common is pulled in via the other packages.
 PACKAGES = ['manila-api',
@@ -50,7 +51,10 @@ PLUGIN_RELATIONS = (LOCAL_PLUGIN_RELATION,
                     REMOTE_PLUGIN_RELATION,)
 
 # select the default release function and ssl feature
-charms_openstack.charm.use_defaults('charm.default-select-release')
+# config.changed is needed to get the policyd override clean-up to work when
+# setting use-policyd-override=false
+charms_openstack.charm.use_defaults('charm.default-select-release',
+                                    'config.changed')
 
 
 def strip_join(s, divider=" "):
@@ -177,7 +181,8 @@ class ManilaRelationAdapters(
 ###
 # Implementation of the Manila Charm classes
 
-class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
+class ManilaCharm(ch_plugins.PolicydOverridePlugin,
+                  charms_openstack.charm.HAOpenStackCharm):
     """ManilaCharm provides the specialisation of the OpenStackCharm
     functionality to manage a manila unit.
     """
@@ -226,6 +231,10 @@ class ManilaCharm(charms_openstack.charm.HAOpenStackCharm):
             ('11', 'victoria'),
         ]),
     }
+
+    # policyd override constants
+    policyd_service_name = 'manila'
+    policyd_restart_on_change = True
 
     @property
     def services(self):
