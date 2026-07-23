@@ -19,6 +19,7 @@ target_deploy_status:
 tests:
   - zaza.openstack.charm_tests.manila.tests.ManilaTests
   - zaza.openstack.charm_tests.manila_ganesha.tests.ManilaGaneshaTests
+  - zaza.openstack.charm_tests.policyd.tests.ManilaTests
 
 configure:
   - zaza.openstack.charm_tests.keystone.setup.add_demo_user
@@ -36,3 +37,5 @@ tests_options:
     # NOTE(lourot): this is needed because the NRPE charm isn't available on
     # non-LTS Ubuntu series. See lp:1933643
     - jammy-yoga
+  policyd:
+    service: manila
