@@ -15,6 +15,7 @@ target_deploy_status:
 tests:
   - zaza.openstack.charm_tests.manila.tests.ManilaTests
   - zaza.openstack.charm_tests.manila_ganesha.tests.ManilaGaneshaTests
+  - zaza.openstack.charm_tests.policyd.tests.ManilaTests
 
 configure:
   - zaza.openstack.charm_tests.keystone.setup.add_demo_user
@@ -31,3 +32,5 @@ tests_options:
     # nrpe charm doesn't support jammy+ and needs to be force installed
     # https://bugs.launchpad.net/charm-nrpe/+bug/1968008
     - noble-caracal
+  policyd:
+    service: manila
