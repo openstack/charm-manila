@@ -157,6 +157,29 @@ and then (with juju 2.x):
 Note that this OpenStack system will need to be configured (in terms of
 networking, images, etc.) before testing can commence.
 
+# Policy Overrides
+
+Policy overrides is an **advanced** feature that allows an operator to override the
+default policy of an OpenStack service. The policies that the service supports,
+the defaults it implements in its code, and the defaults that a charm may
+include should all be clearly understood before proceeding.
+
+> **Caution**: It is possible to break the system (for tenants and other
+  services) if policies are incorrectly applied to the service.
+
+Policy statements are placed in a YAML file. This file (or files) is then (ZIP)
+compressed into a single file and used as an application resource. The override
+is then enabled via a Boolean charm option.
+
+Here are the essential commands (filenames are arbitrary):
+
+    zip overrides.zip override-file.yaml
+    juju attach-resource manila policyd-override=overrides.zip
+    juju config manila use-policyd-override=true
+
+See appendix [Policy Overrides](https://docs.openstack.org/project-deploy-guide/charm-deployment-guide/latest/app-policy-overrides.html) in the [OpenStack Charms Deployment](https://docs.openstack.org/project-deploy-guide/charm-deployment-guide) Guide for a
+thorough treatment of this feature.
+
 # Bugs
 
 Please report bugs on [Launchpad](https://bugs.launchpad.net/charm-manila/+filebug).
