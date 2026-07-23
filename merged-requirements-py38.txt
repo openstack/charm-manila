@@ -8,7 +8,7 @@ attrs==25.3.0
     # via jsonschema
 blessings==1.7
     # via charm-tools
-certifi==2026.5.20
+certifi==2026.7.22
     # via requests
 cffi==1.17.1
     # via cryptography
@@ -20,7 +20,7 @@ charms-openstack @ git+https://github.com/openstack/charms.openstack.git@stable/
     # via -r test-requirements.in
 charms-reactive==1.5.3
     # via -r test-requirements.in
-charset-normalizer==3.4.7
+charset-normalizer==3.4.9
     # via requests
 cheetah3==3.2.6.post1
     # via charm-tools
@@ -41,7 +41,7 @@ cryptography==3.3.2
     #   secretstorage
 dict2colander==0.2
     # via charm-tools
-distlib==0.4.2
+distlib==0.4.3
     # via virtualenv
 extras==1.0.0
     # via testtools
@@ -124,7 +124,7 @@ psutil==7.2.2
     # via -r test-requirements.in
 psycopg2-binary==2.9.10
     # via -r test-requirements.in
-pyaml==26.2.1
+pyaml==26.7.0
     # via charms-reactive
 pycodestyle==2.12.1
     # via flake8
@@ -207,7 +207,7 @@ virtualenv==20.39.1
     # via charm-tools
 voluptuous==0.14.2
     # via stestr
-wcwidth==0.8.1
+wcwidth==0.8.2
     # via cmd2
 zipp==3.20.2
     # via
